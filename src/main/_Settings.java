@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * This template file will hold settings
+ */
 package main;
 
 /*

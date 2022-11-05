@@ -1,3 +1,10 @@
+/*
+ * Author: Ethan Rees
+ * This acts as almost a phone that can be used to connect to one real life client/player. These
+ * are created by the server as new players join and are responsible for communications between
+ * that one client and the server
+ */
+
 package network;
 import java.io.PrintWriter;
 import java.net.Socket;

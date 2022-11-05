@@ -1,3 +1,8 @@
+/*
+ * Author: Ethan Rees
+ * This represents a client or a server, and some of their basic functions.
+ * This is here so that the debug console can be coded easier, and just for oop
+ */
 package network;
 
 /*

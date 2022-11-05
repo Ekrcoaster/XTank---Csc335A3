@@ -1,3 +1,8 @@
+/*
+ * Author: Ethan Rees
+ * This file will open and create a server!
+ */
+
 package main;
 
 import java.io.IOException;

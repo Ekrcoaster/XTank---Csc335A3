@@ -1,3 +1,8 @@
+/*
+ * Author: Ethan Rees
+ * This file will open and create a client (and server if desired)!
+ */
+
 package main;
 
 import java.io.PrintWriter;
@@ -81,7 +86,7 @@ public class Client implements MessageNode {
      * we go into a loop listening for any of the other messages, and handling each
      * message appropriately. The "VICTORY", "DEFEAT", "TIE", and
      * "OTHER_messageListenerER_LEFT" messages will ask the user whether or not to messageListener another
-     * game. If the answer is no, the loop is exited and the network is sent a "QUIT"
+     * scenes. If the answer is no, the loop is exited and the network is sent a "QUIT"
      * message.
      */
     public void startMessageListener() throws Exception 

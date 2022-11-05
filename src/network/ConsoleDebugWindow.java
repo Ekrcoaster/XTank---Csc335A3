@@ -1,3 +1,8 @@
+/*
+ * Author: Ethan Rees
+ * This file just creates a simple console UI that can be used to debug
+ * the network messages being sent back and forth
+ */
 package network;
 
 import java.awt.BorderLayout;
