@@ -72,6 +72,7 @@ public class JoinScene extends Scene implements NetworkListener {
 	@Override
 	public void onMessage(Message message) {
 		if(message.is("join")) {
+			System.out.println(message);
 			playerIDs.add(message.getArg(0));
 			playerNames.add(message.getArg(1));
 			ui.addPlayerName(message.getArg(1));

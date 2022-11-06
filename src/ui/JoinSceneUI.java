@@ -45,13 +45,15 @@ public class JoinSceneUI extends JPanel {
         scroll.setBounds(300, 100, _Settings.windowSize.width - 600, _Settings.windowSize.height - 300);
         add(scroll);
         
-        JLabel serverIP = new JLabel("Join using the Server IP: " + _Settings.getIPAddress());
-        serverIP.setBounds(300, _Settings.windowSize.height - 200, 300, 20);
-        add(serverIP);
+        if(Server.server != null) {
+            JLabel serverIP = new JLabel("Join using the Server IP: " + _Settings.getIPAddress());
+            serverIP.setBounds(300, _Settings.windowSize.height - 200, 300, 20);
+            add(serverIP);
 
-        JLabel serverPort = new JLabel("Port #: " + Server.server.getPort());
-        serverPort.setBounds(300, _Settings.windowSize.height - 185, 300, 20);
-        add(serverPort);
+            JLabel serverPort = new JLabel("Port #: " + Server.server.getPort());
+            serverPort.setBounds(300, _Settings.windowSize.height - 185, 300, 20);
+            add(serverPort);
+        }
         
         int buttonWidth = 200;
         beginGameButton = new JButton(server ? "Begin Game" : "Waiting for server to begin...");
