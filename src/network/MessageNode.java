@@ -13,6 +13,6 @@ package network;
  */
 public interface MessageNode {
 	public void sendMessage(String message);
-	public void messageReceived(MessageNode from, String message);
+	public void messageReceived(Message message);
 	public String getID();
 }	

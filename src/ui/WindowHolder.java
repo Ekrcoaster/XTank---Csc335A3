@@ -11,28 +11,31 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import main._Settings;
+
 public class WindowHolder {
 	public static JFrame frame;
 	public static JPanel active;
 	
-	
-	public static void setPanel(JPanel panel) {
-		frame = new JFrame();
+	public static JPanel setPanel(JPanel panel) {
+		if(frame == null) {
+			frame = new JFrame();
+			
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setSize((int)_Settings.windowSize.getWidth(), (int)_Settings.windowSize.getHeight());
+			frame.setPreferredSize(_Settings.windowSize);
+			frame.setVisible(true);
+			frame.setResizable(false);
+	        
+			frame.setLayout(new BorderLayout());
+		}
 		
-		Dimension size = new Dimension(900, 600);
-		
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize((int)size.getWidth(), (int)size.getHeight());
-		frame.setPreferredSize(size);
-		frame.setVisible(true);
-		frame.setResizable(true);
-        
-		frame.setLayout(new BorderLayout());
-        
 		frame.getContentPane().removeAll();
 		active = panel;
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
 		
 		frame.pack();
+		
+		return panel;
 	}
 }

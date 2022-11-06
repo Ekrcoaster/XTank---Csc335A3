@@ -25,9 +25,11 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	Socket socket;
 	
 	String id;
+	String name;
 	
-	public ServerClientConnection(String id) {
+	public ServerClientConnection(String id, String name) {
 		this.id = id;
+		this.name = name;
 	}
 	
 	/*
@@ -50,17 +52,20 @@ public class ServerClientConnection implements Runnable, MessageNode {
 			setOutput(new PrintWriter(socket.getOutputStream(), true));
 			
 			// once a connection has been established, generate an ID and send it to the player
-			sendMessage(id);
+			sendMessage("id " + id);
 			
 			while (getInput().hasNextLine()) 
 			{
 				String command = getInput().nextLine();
+				Message message = new Message(command, id);
+				
 				
 				// handle an exit command
-				if (command.startsWith("exit"))
+				if (message.is("exit"))
 					return;
 
-				Server.server.messageReceived(this, command);
+				Server.server.messageReceived(message);
+				messageReceived(message);
 			}
 		} 
 		catch (Exception e) 
@@ -78,18 +83,36 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	 */
 	@Override
 	public void sendMessage(String message) {
-		// send it out the actual client
-		if(getOutput() != null)
-			getOutput().println(message);
-	}
-	@Override
-	public void messageReceived(MessageNode from, String message) {
-		// because this object is server side, we don't care at all what is recieved by the server, so its just ginored
 		
+		// send it out the actual client
+		if(getOutput() != null) {
+			getOutput().println(message);
+			
+			Server.server.callListenersOnSentMessage(new Message(message, null));
+		}
 	}
+	
+	/*
+	 * These are all of the messages received by the connected client, useful for commands!
+	 */
+	@Override
+	public void messageReceived(Message message) {
+		if(message.is("join")) {
+			name = message.getArg(0);
+		}
+		
+		if(message.is("playerList")) {
+			sendMessage("retPlayerList " + Server.server.constructPlayerList());
+		}
+	}
+	
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 	public void setInput(Scanner input) { this.input = input;}

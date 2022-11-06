@@ -22,7 +22,7 @@ import network.*;
 /*
  * This class will create a network and create the client thread connections. It can also send and receive messages
  */
-public class Server implements MessageNode {
+public class Server extends NetworkActivityCaller implements MessageNode {
 	
 	// a static connection to the network reference. This is done because there is only 1 network ever running at once.
 	public static Server server;
@@ -32,9 +32,6 @@ public class Server implements MessageNode {
 	public HashMap<String, ServerClientConnection> players;
 	private ServerClientConnection nextPotentialPlayer;
 	
-	// used for debugging messages sent
-	public ConsoleDebugWindow debugConsole;
-	
 	ExecutorService pool;
 	ServerSocket listener;
 	int port;
@@ -42,25 +39,20 @@ public class Server implements MessageNode {
 	/*
 	 * When the network is created, startup the network and thread pool
 	 */
-	public Server() {
+	public Server(int port) throws IOException {
+		server = this;
 		players = new HashMap<String, ServerClientConnection>();
-		port = _Settings.defaultPort;
+		this.port = port;
+
+		listener = new ServerSocket(port);
+		System.out.println("Server started on port " + port + "\nIP: " + InetAddress.getLocalHost());
 		
-		// attempt to create the network
-		try {
-			listener = new ServerSocket(port);
-			System.out.println("Server started on port " + port + "\nIP: " + InetAddress.getLocalHost());
-			
-			pool = Executors.newFixedThreadPool(200);
-			pool.execute(() -> newPlayerListenerServerThread());
-		} catch (Exception e) {
-			System.out.println("Server failed to start!");
-			e.printStackTrace();
-			return;
-		}
+		pool = Executors.newFixedThreadPool(200);
+		pool.execute(() -> newPlayerListenerServerThread());
+		
 		
 		if(_Settings.createDebugConsoles)
-			debugConsole = new ConsoleDebugWindow(this);
+			new ConsoleDebugWindow(this, this);
 	}
 
 	/*
@@ -101,7 +93,7 @@ public class Server implements MessageNode {
 		for(int i = 0; i < 8; i++)
 			id += possibleCharacters.charAt((int)(Math.random() * possibleCharacters.length()));
 		
-		nextPotentialPlayer = new ServerClientConnection(id);
+		nextPotentialPlayer = new ServerClientConnection(id, null);
 	}
 
 	/*
@@ -124,9 +116,8 @@ public class Server implements MessageNode {
 	 * One of the clients has sent me a message!
 	 */
 	@Override
-	public void messageReceived(MessageNode from, String message) {
-		if(debugConsole != null)
-			debugConsole.addMessage(from.getID(), message);
+	public void messageReceived(Message message) {
+		callListenersOnMessage(message);
 	}
 
 	/*
@@ -137,10 +128,23 @@ public class Server implements MessageNode {
 		return "network";
 	}
 	
+	public String constructPlayerList() {
+		String build = "";
+		
+		for(ServerClientConnection player : players.values())
+			build += player.getID() + " " + player.getName() + " ";
+		
+		return build;
+	}
+	
+	public int getPort() {
+		return port;
+	}
+
 	/*
 	 * This class can be run alone, in which it'll create the network and start it
 	 */
 	public static void main(String[] args) throws IOException {
-		server = new Server();
+		new Server(_Settings.defaultPort);
 	}
 }

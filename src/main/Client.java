@@ -17,7 +17,7 @@ import network.*;
  * 
  * The client handles the connections from the network
  */
-public class Client implements MessageNode {
+public class Client extends NetworkActivityCaller implements MessageNode {
     public static Client client;
     
     private Socket socket;
@@ -28,29 +28,38 @@ public class Client implements MessageNode {
     public String serverAddress;
     public int port;
     public String id;
+    public String name;
 
-    public Client() throws Exception
+    public Client(boolean createServerIfNeeded, String ipAddress, int port, String name) throws Exception
     {
-    	this.port = _Settings.defaultPort;
-    	this.serverAddress = _Settings.defaultServerAdress;
+    	client = this;
+    	this.port = port;
+    	this.serverAddress = ipAddress;
+    	this.name = name;
     	
     	// if the network wasn't able to be connected to, maybe it doesn't exist yet? So create it
-    	if(!attemptConnect() && _Settings.clientCreatesServer) {
+    	if(!attemptConnect()) {
     		// try to create the network
-    		try {
-        		Server.main(null);
-    		} catch (Exception e) {
+    		if(createServerIfNeeded) {
+        		try {
+        			new Server(port);
+            		// then try to reconnect
+            		if(!attemptConnect())
+            			throw new Exception("Unable to connect to myself... for some reason");
+        		} catch (Exception e) {
+        			throw new Exception("Starting up the server failed!");
+        		}
+    		} else {
+    			throw new Exception("No Server Found");
     		}
-    		// then try to reconnect
-    		attemptConnect();
     	}
     	
     	if(_Settings.createDebugConsoles)
-    		debugConsoleDialogue = new ConsoleDebugWindow(this);
+    		debugConsoleDialogue = new ConsoleDebugWindow(this, this);
 
     	// tell the network I'd like to join!
-        sendMessage("join");
-        startMessageListener();
+        sendMessage("join " + name);
+        new Thread(() -> {startMessageListener();}).start();
     }
     
     public boolean attemptConnect() {
@@ -67,12 +76,17 @@ public class Client implements MessageNode {
 	@Override
 	public void sendMessage(String message) {
     	out.println(message);
+    	
+    	callListenersOnSentMessage(new Message(message, null));
 	}
 
 	@Override
-	public void messageReceived(MessageNode from, String message) {
-		if(debugConsoleDialogue != null)
-			debugConsoleDialogue.addMessage("Server", message);
+	public void messageReceived(Message message) {
+		// if the command is "id", it'll tell the client to set the ID to that (only used on startup)
+		if(message.is("id"))
+			this.id = message.getArg(0);
+		
+		callListenersOnMessage(message);
 	}
 
 	@Override
@@ -89,17 +103,13 @@ public class Client implements MessageNode {
      * scenes. If the answer is no, the loop is exited and the network is sent a "QUIT"
      * message.
      */
-    public void startMessageListener() throws Exception 
+    public void startMessageListener()
     {
         try 
         {
-        	// send the client the ID
-        	id = in.nextLine();
-        	if(debugConsoleDialogue != null) debugConsoleDialogue.setID(id);
-        	
             while (in.hasNextLine()) 
             {
-                messageReceived(null, in.nextLine());
+                messageReceived(new Message(in.nextLine(), null));
             }
             
             sendMessage("exit");
@@ -110,7 +120,10 @@ public class Client implements MessageNode {
         } 
         finally 
         {
-            socket.close();
+        	try {
+                socket.close();
+        	} catch(Exception e) {
+        	}
             if(debugConsoleDialogue != null) debugConsoleDialogue.exit();
         }
     }
@@ -118,6 +131,6 @@ public class Client implements MessageNode {
     // runs the client
     public static void main(String[] args) throws Exception 
     {
-    	client = new Client();
+    	new Client(_Settings.clientCreatesServer, _Settings.defaultServerAdress, _Settings.defaultPort, "Testing");
     }
 }

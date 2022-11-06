@@ -1,0 +1,20 @@
+id <new-id>
+Server -> Client
+This will tell the Client to set their ID to whatever is given
+
+join <clientName>
+Client -> Server
+This will tell the server a new client is wanting to join and will give the server the client's name
+
+joined <clientID> <clientName>
+Server -> Client
+This will tell the Client if a new player has joined
+
+playerList
+Client -> Server
+This will ask the server for the list of current players's IDs and names
+
+retPlayerList
+Server -> Client
+This will return to the client (who asked) the list of the connected players' IDs and names
+format: clientIDA clientNameA clientIDB clientNameB clientIDC clientNameC

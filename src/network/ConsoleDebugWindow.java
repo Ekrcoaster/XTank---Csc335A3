@@ -10,7 +10,7 @@ import java.awt.Dimension;
 
 import javax.swing.*;
 
-public class ConsoleDebugWindow extends JFrame {
+public class ConsoleDebugWindow extends JFrame implements NetworkListener {
 	
 	DefaultListModel<String> logModel;
 	JScrollPane scroll;
@@ -21,9 +21,11 @@ public class ConsoleDebugWindow extends JFrame {
 	MessageNode myself;
 	String id;
 	
-	public ConsoleDebugWindow(MessageNode myself) {
+	public ConsoleDebugWindow(MessageNode myself, NetworkActivityCaller listener) {
 		this.myself = myself;
 		this.id = myself.getID();
+		
+		listener.addListener(this);
 		
 		Dimension size = new Dimension(300, 500);
 		
@@ -62,7 +64,6 @@ public class ConsoleDebugWindow extends JFrame {
         
         sendButton.addActionListener(l -> {
         	sendMessage(textField.getText());
-        	addMessage(null, textField.getText());
         	textField.setText("");
         });
         
@@ -82,16 +83,30 @@ public class ConsoleDebugWindow extends JFrame {
 		dispose();
 	}
 	
-	public void addMessage(String from, String message) {
-		if(from == null) {	
-			logModel.addElement("-- sent: " + message + " --");
+	public void sendMessage(String message) {
+		myself.sendMessage(message);
+	}
+
+	@Override
+	public void onMessage(Message message) {
+		// the command id will set arg 0 to the title of this window
+		if(message.is("id"))
+			setID(message.getArg(0));
+		
+		if(message.fromID == null) {	
+			logModel.addElement("Server: " + message);
 		} else {
-			logModel.addElement(from + " > " + message);
+			logModel.addElement(message.fromID + ": " + message);
 		}
 		scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
 	}
 	
-	public void sendMessage(String message) {
-		myself.sendMessage(message);
+	public void addSentIndicator(String message) {
+		logModel.addElement("  -- you sent: " + message + " --");
+	}
+
+	@Override
+	public void onSentMessage(Message message) {
+		addSentIndicator(message.toString());
 	}
 }
