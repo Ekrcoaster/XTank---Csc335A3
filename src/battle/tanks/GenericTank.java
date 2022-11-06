@@ -9,8 +9,8 @@ import battle.bullets.GenericBullet;
 
 public class GenericTank extends Tank {
 
-	public GenericTank(String id) {
-		super(id);
+	public GenericTank(String id, String name, boolean isServerControlled) {
+		super(id, name, isServerControlled);
 		this.health = 10;
 		this.moveSpeed = 5;
 		this.rotateSpeed = 3;

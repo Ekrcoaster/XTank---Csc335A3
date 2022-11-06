@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import main.*;
+import _main.*;
 
 /*
  * So this class is the messager from the server to the client. Say there are 5 players on the server,
@@ -83,11 +83,9 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	 */
 	@Override
 	public void sendMessage(String message) {
-		
 		// send it out the actual client
 		if(getOutput() != null) {
 			getOutput().println(message);
-			
 			Server.server.callListenersOnSentMessage(new Message(message, null));
 		}
 	}
@@ -99,6 +97,14 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	public void messageReceived(Message message) {
 		if(message.is("join")) {
 			name = message.getArg(0);
+		}
+		
+		if(message.is("sPos")) {
+			Server.server.sendMessageToAllBut("rPos " + id + " " + message.joinedArgs(), id);
+		}
+
+		if(message.is("sDir")) {
+			Server.server.sendMessageToAllBut("rDir " + id + " " + message.joinedArgs(), id);
 		}
 		
 		if(message.is("playerList")) {
