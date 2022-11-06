@@ -6,52 +6,30 @@
 package scenes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-import _main._Settings;
 import battle.tanks.GenericTank;
 import battle.tanks.Tank;
-import network.Message;
-import network.NetworkListener;
 import ui.BattleBoardUI;
 import ui.WindowHolder;
 
-public class BattleScene extends Scene implements NetworkListener {
-
-	public HashMap<String, Tank> players;
+public class BattleScene extends Scene {
 	
+	public ArrayList<Tank> tankPlayers;
 	public static final int FPS = 30;
 	public BattleBoardUI ui;
 	
-	private String playerID;
-	
 	public boolean exit;
 	Thread gameTickThread;
-	
-	public BattleScene(String playerID, String playerName, ArrayList<String> otherPlayerIDs, ArrayList<String> otherPlayerNames) {
-		players = new HashMap<String, Tank>();
-		this.playerID = playerID;
-		if(playerID != null) 
-			players.put(playerID, new GenericTank(playerID, playerName, false)); 
-		
-		System.out.println("client player: " + players.get(0));
-		
-		for(int i = 0; i < otherPlayerIDs.size(); i++) {
-			Tank newTank = new GenericTank(otherPlayerIDs.get(i), otherPlayerNames.get(i), true);
-
-			System.out.println("added player: " + newTank);
-			players.put(otherPlayerIDs.get(i), newTank);
-		}
-		
-		for(Tank tank : players.values()) {
-			placeTankAtRandomPosition(tank);
-		}
-	}
 
 	@Override
 	public void init() {
 		exit = false;
+		
+		tankPlayers = new ArrayList<Tank>();
+		tankPlayers.add(new GenericTank("a"));
+		tankPlayers.get(0).setX(150);
+		tankPlayers.get(0).setY(150);
+		tankPlayers.get(0).setDirection(0);
 		
 		// create the scenes board UI
 		ui = new BattleBoardUI();
@@ -59,7 +37,7 @@ public class BattleScene extends Scene implements NetworkListener {
 		
 		render();
 		
-		// create the _main scenes tick thread, this will call update/render based on the fps
+		// create the main scenes tick thread, this will call update/render based on the fps
 		gameTickThread = new Thread(() -> {
 			// get the last time, the fps tick ratio, and the delta
 			long lastTime = System.nanoTime();
@@ -93,41 +71,13 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 	
 	public void update() {
-		for(Map.Entry<String, Tank> entree : players.entrySet()) {
-			if(entree.getKey().equals(playerID))
-				entree.getValue().updateControls(ui.getKeysDown());
-			entree.getValue().update();
+		for(Tank tank : tankPlayers) {
+			tank.updateControls(ui.getKeysDown());
+			tank.update();
 		}
 	}
 	
 	public void render() {
-		ui.render(players.values());
+		ui.render(tankPlayers);
 	}
-	
-	public void placeTankAtRandomPosition(Tank tank) {
-		tank.setX((Math.random() * _Settings.windowSize.getWidth() * 0.75)+  _Settings.windowSize.getWidth() * 0.15);
-		tank.setY((Math.random() * _Settings.windowSize.getHeight() * 0.75) +  _Settings.windowSize.getHeight() * 0.15);
-	}
-
-	@Override
-	public void onMessage(Message message) {	
-		if(message.is("rPos")) {
-			String id = message.getArg(0);
-			double x = message.doubleArg(1);
-			double y = message.doubleArg(2);
-			
-			players.get(id).setX(x);
-			players.get(id).setY(y);
-		}
-		
-		if(message.is("rDir")) {
-			String id = message.getArg(0);
-			double dir = message.doubleArg(1);
-			
-			players.get(id).setDirection(dir);
-		}
-	}
-
-	@Override
-	public void onSentMessage(Message message) { }
 }

@@ -7,10 +7,10 @@ package scenes;
 
 import java.util.ArrayList;
 
-import network.Client;
+import main.Client;
+import main.Server;
 import network.Message;
 import network.NetworkListener;
-import network.Server;
 import ui.JoinSceneUI;
 import ui.WindowHolder;
 
@@ -22,15 +22,9 @@ public class JoinScene extends Scene implements NetworkListener {
 	public ArrayList<String> playerIDs;
 	public ArrayList<String> playerNames;
 	
-	public String myPlayerID;
-	public String myPlayerName;
-	
-	public JoinScene(boolean client, boolean server, String playerID, String playerName) {
+	public JoinScene(boolean client, boolean server) {
 		this.client = client;
 		this.server = server;
-
-		this.myPlayerID = playerID;
-		this.myPlayerName = playerName;
 	}
 
 	@Override
@@ -54,19 +48,9 @@ public class JoinScene extends Scene implements NetworkListener {
 		}
 	}
 
-	/*
-	 * Pass the information along and begin the scene
-	 */
+	
 	public void beginGame() {
-		// if my player ID is real, it is gonna be in the list of playerIDs, so remove it
-		if(myPlayerID != null) {
-			System.out.println(myPlayerID);
-			int index = playerIDs.indexOf(myPlayerID);
-			playerIDs.remove(index);
-			playerNames.remove(index);
-		}
-		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames);
-		SceneManager.setScene(scene);
+		// TODO this is where the game begins, somehow
 	}
 
 	@Override

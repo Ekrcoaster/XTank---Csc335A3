@@ -2,7 +2,7 @@
  * Author: Ethan Rees
  * This template file will hold settings
  */
-package _main;
+package main;
 
 import java.awt.Dimension;
 import java.net.InetAddress;

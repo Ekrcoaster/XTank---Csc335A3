@@ -3,7 +3,7 @@
  * This file will open and create a server!
  */
 
-package network;
+package main;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,8 +17,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import _main._Settings;
+import network.*;
 
 /*
  * This class will create a network and create the client thread connections. It can also send and receive messages
@@ -111,16 +110,6 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 	public void sendMessage(String message) {
 		for(ServerClientConnection player : players.values())
 			player.sendMessage(message);
-	}
-	
-	/*
-	 * Send the message to all clients BUT the one
-	 */
-	public void sendMessageToAllBut(String message, String exceptClientID) {
-		for(ServerClientConnection player : players.values()) {
-			if(!player.getID().equals(exceptClientID))
-				player.sendMessage(message);
-		}
 	}
 
 	/*

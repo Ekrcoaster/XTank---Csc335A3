@@ -14,10 +14,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import _main._Settings;
+import main.Server;
+import main._Settings;
 import network.Message;
 import network.NetworkListener;
-import network.Server;
 import scenes.JoinScene;
 import scenes.SceneManager;
 

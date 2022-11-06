@@ -6,41 +6,33 @@
 package battle.tanks;
 
 import java.awt.Color;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 
 import battle.bullets.Bullet;
-import network.Client;
-import network.NetworkListener;
 import scenes.BattleScene;
 
 public abstract class Tank {
-	public boolean isServerControlled;
-	protected String id, name;
+	protected String id;
+	protected int health;
 	protected double x, y;
 	protected double direction; //degrees
 	protected double size;
-
-	protected int health;
 	protected double moveSpeed, rotateSpeed;
 	protected double bulletSpeedCooldown; // seconds
-
-	double cachedSin, cachedCos;
+	
 	private double bulletActiveCooldown;
+	double cachedSin, cachedCos;
 	public HashSet<Bullet> shotBullets;
 	
-	public Tank(String id, String name, boolean isServerControlled) {
-		this.isServerControlled = isServerControlled;
+	public Tank(String id) {
 		this.id = id;
-		this.name = name;
-		
 		this.x = 0;
 		this.y = 0;
-		setDirection(0);
-		this.size = 0;
+		this.direction = 0;
 		this.health = 0;
+		this.size = 0;
 		this.moveSpeed = 0;
 		this.rotateSpeed = 0;
 		this.shotBullets = new HashSet<Bullet>();
@@ -77,12 +69,9 @@ public abstract class Tank {
 	}
 	
 	/*
-	 * The _main update, update all of the bullets and cooldowns
+	 * The main update, update all of the bullets and cooldowns
 	 */
 	public void update() {
-		if(isServerControlled)
-			return;
-		
 		for(Bullet bullet : shotBullets) {
 			bullet.update();
 		}
@@ -95,35 +84,28 @@ public abstract class Tank {
 	 * This will only get called if this tank is the player, it updates controls
 	 */
 	public void updateControls(HashSet<Integer> keysDown) {
+
 		if(keysDown.contains(KeyEvent.VK_LEFT) || keysDown.contains(KeyEvent.VK_KP_LEFT)) {
 			turn(-rotateSpeed);
-			sendMessage("sDir " + direction);
 		}
 
 		if(keysDown.contains(KeyEvent.VK_RIGHT) || keysDown.contains(KeyEvent.VK_KP_RIGHT)) {
 			turn(rotateSpeed);
-			sendMessage("sDir " + direction);
 		}
 
 		if(keysDown.contains(KeyEvent.VK_UP) || keysDown.contains(KeyEvent.VK_KP_UP)) {
 			move(moveSpeed);
-			sendMessage("sPos " + x + " " + y);
 		}
 
 		if(keysDown.contains(KeyEvent.VK_DOWN) || keysDown.contains(KeyEvent.VK_KP_DOWN)) {
 			move(-moveSpeed);
-			sendMessage("sPos " + x + " " + y);
 		}
 		if(keysDown.contains(KeyEvent.VK_SPACE) && bulletActiveCooldown <= 0) {
 			shotBullets.add(shoot(rotatePoint(0, -size*2).offset(x, y), direction));
 			bulletActiveCooldown = bulletSpeedCooldown;
 		}
 	}
-
-	protected void sendMessage(String message) {
-		Client.client.sendMessage(message);
-	}
-
+		
 	// -------------------
 	//      rendering
 	// -------------------
@@ -142,21 +124,8 @@ public abstract class Tank {
 				rotatePoint(size, size).offset(x, y),
 				rotatePoint(-size, size).offset(x, y)
 		}, g);
-		
-		renderHoverUI(g, rotatePoint(0, size*1.5).offset(x, y));
 	}
 	
-	protected void renderHoverUI(Graphics g, IntPoint origin) {
-		FontMetrics metrics = g.getFontMetrics();
-		int width = metrics.stringWidth(name);
-		int height = 14;
-		g.setColor(new Color(10, 10, 10));
-		g.fillRect((int)(origin.x - width*.5), (int)(origin.y - height * 0.7), width, height);
-		
-		g.setColor(isServerControlled ? Color.blue : Color.red);
-		g.drawString(name, (int)(origin.x - width*.5), origin.y);
-	}
-
 	/*
 	 * Given a x/y, rotate it by the current direction
 	 */
@@ -182,7 +151,6 @@ public abstract class Tank {
 	// -------------------
 	//  getters / setters
 	// -------------------
-
 	
 	public double getX() {
 		return x;
@@ -209,18 +177,13 @@ public abstract class Tank {
 		cachedSin = Math.sin(Math.toRadians(direction));
 		cachedCos = Math.cos(Math.toRadians(direction));
 	}
-	
+
 	public int getHealth() {
 		return health;
 	}
 
 	public void setHealth(int health) {
 		this.health = health;
-	}
-	
-	@Override
-	public String toString() {
-		return "[tank " + id + " (" + name + ")]";
 	}
 }
 
@@ -242,4 +205,3 @@ class IntPoint {
 		return this;
 	}
 }
-

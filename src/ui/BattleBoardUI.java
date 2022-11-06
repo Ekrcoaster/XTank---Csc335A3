@@ -13,7 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -27,7 +26,7 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 	BufferStrategy bufferStrategy;
 	Graphics graphics;
 	HashSet<Integer> keysDown;
-	Collection<Tank> tanks;
+	ArrayList<Tank> tanks;
 	
 	public BattleBoardUI() {
 		this.tanks = new ArrayList<Tank>();
@@ -41,7 +40,7 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		requestFocus();
 	}
 
-	public void render(Collection<Tank> tanks) {
+	public void render(ArrayList<Tank> tanks) {
 		this.tanks = tanks;
 		repaint();
 	}
@@ -57,6 +56,10 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 				bullet.render(g);
 		}
 		
+	}
+	
+	public void setTanks(ArrayList<Tank> tanks) {
+		this.tanks = tanks;
 	}
 	
 	public HashSet<Integer> getKeysDown() {

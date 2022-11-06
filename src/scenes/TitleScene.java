@@ -6,8 +6,8 @@
  */
 package scenes;
 
-import network.Client;
-import network.Server;
+import main.Client;
+import main.Server;
 import ui.TitleSceneUI;
 import ui.WindowHolder;
 
@@ -32,10 +32,10 @@ public class TitleScene extends Scene {
 				// is passed into the client so the client knows to create the server if needed
 				// notice their name has spaces replaced with underscores, this packs it as 1 word
 				// so sending the name through messages wont get confusing
-				Client c = new Client(server, address, port, name.replace(" ", "_"));
+				new Client(server, address, port, name.replace(" ", "_"));
 				
 				// finally, swap the scenes to the join scene
-				SceneManager.setScene(new JoinScene(client, server, c.id, name));
+				SceneManager.setScene(new JoinScene(client, server));
 				
 			} catch (Exception e) {
 				ui.pushError(e);
@@ -46,7 +46,7 @@ public class TitleScene extends Scene {
 		} else if(server) {
 			try {
 				new Server(port);
-				SceneManager.setScene(new JoinScene(client, server, null, null));
+				SceneManager.setScene(new JoinScene(client, server));
 				
 			} catch (Exception e) {
 				ui.pushError(e);

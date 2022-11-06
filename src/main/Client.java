@@ -1,16 +1,15 @@
 /*
-
  * Author: Ethan Rees
  * This file will open and create a client (and server if desired)!
  */
 
-package network;
+package main;
 
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import _main._Settings;
+import network.*;
 
 /*
  * This is the client, it can be ran and if so, 
@@ -96,7 +95,7 @@ public class Client extends NetworkActivityCaller implements MessageNode {
 	}
 
     /**
-     * The _main thread of the client will listen for messages from the network. The
+     * The main thread of the client will listen for messages from the network. The
      * first message will be a "WELCOME" message in which we receive our mark. Then
      * we go into a loop listening for any of the other messages, and handling each
      * message appropriately. The "VICTORY", "DEFEAT", "TIE", and

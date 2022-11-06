@@ -1,6 +1,6 @@
 /*
  * Author: Ethan Rees
- * This class will setup the default window and will allow easily changing out the _main panel to different
+ * This class will setup the default window and will allow easily changing out the main panel to different
  * ui scenes
  */
 package ui;
@@ -11,7 +11,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import _main._Settings;
+import main._Settings;
 
 public class WindowHolder {
 	public static JFrame frame;

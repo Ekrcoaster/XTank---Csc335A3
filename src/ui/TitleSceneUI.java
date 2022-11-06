@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import _main._Settings;
+import main._Settings;
 import scenes.TitleScene;
 
 public class TitleSceneUI extends JPanel {
