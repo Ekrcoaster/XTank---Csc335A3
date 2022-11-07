@@ -36,13 +36,20 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		
 		setFocusable(true);
 		
-		addKeyListener(this);
 		requestFocusInWindow();
 		requestFocus();
+
+		addKeyListener(this);
+		System.out.println("a");
 	}
 
 	public void render(Collection<Tank> tanks) {
 		this.tanks = tanks;
+		if(!isFocusOwner()) {
+			requestFocusInWindow();
+			requestFocus();
+		}
+		
 		repaint();
 	}
 	

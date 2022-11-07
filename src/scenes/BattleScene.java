@@ -35,7 +35,7 @@ public class BattleScene extends Scene implements NetworkListener {
 		if(playerID != null) 
 			players.put(playerID, new GenericTank(playerID, playerName, false)); 
 		
-		System.out.println("client player: " + players.get(0));
+		System.out.println("client player: " + players.get(playerID));
 		
 		for(int i = 0; i < otherPlayerIDs.size(); i++) {
 			Tank newTank = new GenericTank(otherPlayerIDs.get(i), otherPlayerNames.get(i), true);
@@ -93,10 +93,10 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 	
 	public void update() {
-		for(Map.Entry<String, Tank> entree : players.entrySet()) {
-			if(entree.getKey().equals(playerID))
-				entree.getValue().updateControls(ui.getKeysDown());
-			entree.getValue().update();
+		for(Tank tank : players.values()) {
+			if(!tank.isServerControlled)
+				tank.updateControls(ui.getKeysDown());
+			tank.update();
 		}
 	}
 	

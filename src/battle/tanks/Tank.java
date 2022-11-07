@@ -220,7 +220,7 @@ public abstract class Tank {
 	
 	@Override
 	public String toString() {
-		return "[tank " + id + " (" + name + ")]";
+		return "[tank " + id + " (" + name + "), server: " + isServerControlled + "]";
 	}
 }
 

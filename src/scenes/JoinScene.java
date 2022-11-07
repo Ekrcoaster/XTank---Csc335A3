@@ -58,13 +58,28 @@ public class JoinScene extends Scene implements NetworkListener {
 	 * Pass the information along and begin the scene
 	 */
 	public void beginGame() {
+		// remove the null players who accidentally slip in
+		for(int i = 0; i < playerIDs.size(); i++) {
+			if(playerIDs.get(i) == null) {
+				playerIDs.remove(i);
+				playerNames.remove(i);
+				i--;
+			}
+		}
+		
+		enterBattleScene();
+		
+		Server.server.sendMessage("start battle");
+	}
+	
+	public void enterBattleScene() {
 		// if my player ID is real, it is gonna be in the list of playerIDs, so remove it
-		if(myPlayerID != null) {
-			System.out.println(myPlayerID);
+		if(client) {
 			int index = playerIDs.indexOf(myPlayerID);
 			playerIDs.remove(index);
 			playerNames.remove(index);
 		}
+				
 		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames);
 		SceneManager.setScene(scene);
 	}
@@ -72,14 +87,19 @@ public class JoinScene extends Scene implements NetworkListener {
 	@Override
 	public void onMessage(Message message) {
 		if(message.is("join")) {
-			System.out.println(message);
-			playerIDs.add(message.getArg(0));
-			playerNames.add(message.getArg(1));
-			ui.addPlayerName(message.getArg(1));
+			playerIDs.add(message.fromID);
+			playerNames.add(message.getArg(0));
+			ui.addPlayerName(message.getArg(0));
 		}
 		
 		if(message.is("retPlayerList")) {
 			populatePlayerList(message.joinedArgs());
+		}
+		
+		if(message.is("start")) {
+			if(message.getArg(0).equals("battle")) {
+				enterBattleScene();
+			}
 		}
 	}
 
@@ -97,7 +117,13 @@ public class JoinScene extends Scene implements NetworkListener {
 	}
 
 	@Override
-	public void exit() { }
+	public void exit() {
+		if(server) {
+			Server.server.removeListener(this);
+		} else if(client) {
+			Client.client.removeListener(this);
+		}
+	}
 	
 	@Override
 	public void onSentMessage(Message message) { }

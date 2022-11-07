@@ -28,7 +28,7 @@ public class Message {
 	
 	@Override
 	public String toString() {
-		return label + " " + joinedArgs();
+		return label + " " + joinedArgs() + " (from: " + fromID + ")";
 	}
 	
 	/*
