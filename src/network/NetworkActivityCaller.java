@@ -18,12 +18,16 @@ public HashSet<NetworkListener> listeners = new HashSet<NetworkListener>();
 	}
 	
 	public void callListenersOnMessage(Message message) {
-		for(NetworkListener listener : listeners)
-			listener.onMessage(message);
+		for(NetworkListener listener : listeners) {
+			if(listener != null)
+				listener.onMessage(message);
+		}
 	}
 	
 	public void callListenersOnSentMessage(Message message) {
-		for(NetworkListener listener : listeners)
-			listener.onSentMessage(message);
+		for(NetworkListener listener : listeners) {
+			if(listener != null)
+				listener.onSentMessage(message);
+		}
 	}
 }

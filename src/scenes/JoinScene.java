@@ -40,24 +40,20 @@ public class JoinScene extends Scene implements NetworkListener {
 		playerNames = new ArrayList<String>();
 		WindowHolder.setPanel(ui);
 		
-		if(server) {
-			Server.server.addListener(this);
-			
-			// because we are already the server, we can just ask for the player list ourselves
-			populatePlayerList(Server.server.constructPlayerList());
-			
-			// also just ask for the client's id directly, since id will automatically be set
-			if(client)
-				this.myPlayerID = Client.client.id;
-		}
-		else if(client) {
+		if(client) {
 			Client.client.addListener(this);
 			
-			// since this is just the client, ask for the player list to catch up
+			// ask for the player list to chatch up
 			Client.client.sendMessage("playerList");
 
 			// ask for my ID just to make sure
 			Client.client.sendMessage("myID");
+			
+		} else if(server) {
+			Server.server.addListener(this);
+
+			// because we are already the server, we can just ask for the player list ourselves
+			populatePlayerList(Server.server.constructPlayerList());
 		}
 	}
 
