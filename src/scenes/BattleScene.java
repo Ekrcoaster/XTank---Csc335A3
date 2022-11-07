@@ -202,7 +202,10 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 
 	private Tank createTank(String playerID, String name, boolean serverControlled) {
-		return new GenericTank(playerID, name, serverControlled, this);
+		Tank tank = new GenericTank(playerID, name, serverControlled, this);
+		tank.setX(500);
+		tank.setY(500);
+		return tank;
 	}
 	
 	private Bullet createBullet(String playerID, String bulletType, double x, double y, double direction) {
