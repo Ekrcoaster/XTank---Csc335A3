@@ -112,6 +112,7 @@ public class BattleScene extends Scene implements NetworkListener {
 	@Override
 	public void onMessage(Message message) {	
 		if(message.is("rPos")) {
+			System.out.println("recieved pos from " + message);
 			String id = message.getArg(0);
 			double x = message.doubleArg(1);
 			double y = message.doubleArg(2);

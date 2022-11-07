@@ -97,6 +97,7 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	public void messageReceived(Message message) {
 		if(message.is("join")) {
 			name = message.getArg(0);
+			Server.server.sendMessageToAllBut("joined " + id + " " + name, id);
 		}
 		
 		if(message.is("sPos")) {
