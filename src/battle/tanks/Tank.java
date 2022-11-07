@@ -97,22 +97,22 @@ public abstract class Tank {
 	public void updateControls(HashSet<Integer> keysDown) {
 		if(keysDown.contains(KeyEvent.VK_LEFT) || keysDown.contains(KeyEvent.VK_KP_LEFT)) {
 			turn(-rotateSpeed);
-			sendMessage("sDir " + direction);
+			saveDirectionToServer();
 		}
 
 		if(keysDown.contains(KeyEvent.VK_RIGHT) || keysDown.contains(KeyEvent.VK_KP_RIGHT)) {
 			turn(rotateSpeed);
-			sendMessage("sDir " + direction);
+			saveDirectionToServer();
 		}
 
 		if(keysDown.contains(KeyEvent.VK_UP) || keysDown.contains(KeyEvent.VK_KP_UP)) {
 			move(moveSpeed);
-			sendMessage("sPos " + x + " " + y);
+			savePositionToServer();
 		}
 
 		if(keysDown.contains(KeyEvent.VK_DOWN) || keysDown.contains(KeyEvent.VK_KP_DOWN)) {
 			move(-moveSpeed);
-			sendMessage("sPos " + x + " " + y);
+			savePositionToServer();
 		}
 		if(keysDown.contains(KeyEvent.VK_SPACE) && bulletActiveCooldown <= 0) {
 			shotBullets.add(shoot(rotatePoint(0, -size*2).offset(x, y), direction));
@@ -122,6 +122,14 @@ public abstract class Tank {
 
 	protected void sendMessage(String message) {
 		Client.client.sendMessage(message);
+	}
+	
+	public void savePositionToServer() {
+		sendMessage("sPos " + x + " " + y);
+	}
+	
+	public void saveDirectionToServer() {
+		sendMessage("sDir " + direction);
 	}
 
 	// -------------------

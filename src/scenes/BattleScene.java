@@ -34,8 +34,9 @@ public class BattleScene extends Scene implements NetworkListener {
 	public BattleScene(String playerID, String playerName, ArrayList<String> otherPlayerIDs, ArrayList<String> otherPlayerNames) {
 		players = new HashMap<String, Tank>();
 		this.playerID = playerID;
-		if(playerID != null) 
+		if(playerID != null)
 			players.put(playerID, new GenericTank(playerID, playerName, false)); 
+		
 		
 		System.out.println("client player: " + players.get(playerID));
 		
@@ -44,10 +45,6 @@ public class BattleScene extends Scene implements NetworkListener {
 
 			System.out.println("added player: " + newTank);
 			players.put(otherPlayerIDs.get(i), newTank);
-		}
-		
-		for(Tank tank : players.values()) {
-			placeTankAtRandomPosition(tank);
 		}
 	}
 
@@ -66,7 +63,7 @@ public class BattleScene extends Scene implements NetworkListener {
 			Client.client.addListener(this);
 		}
 		
-		render();
+		placeTankAtRandomPosition(players.get(playerID));
 		
 		// create the _main scenes tick thread, this will call update/render based on the fps
 		gameTickThread = new Thread(() -> {
@@ -116,11 +113,11 @@ public class BattleScene extends Scene implements NetworkListener {
 	public void placeTankAtRandomPosition(Tank tank) {
 		tank.setX((Math.random() * _Settings.windowSize.getWidth() * 0.75)+  _Settings.windowSize.getWidth() * 0.15);
 		tank.setY((Math.random() * _Settings.windowSize.getHeight() * 0.75) +  _Settings.windowSize.getHeight() * 0.15);
+		tank.savePositionToServer();
 	}
 
 	@Override
 	public void onMessage(Message message) {
-		System.out.println("message: " + message);
 		// client received info about other client's position
 		if(message.is("rPos")) {
 			updateTankPos(message.getArg(0), message.doubleArg(1), message.doubleArg(2));
