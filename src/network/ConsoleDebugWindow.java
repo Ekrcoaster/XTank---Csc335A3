@@ -24,7 +24,8 @@ public class ConsoleDebugWindow extends JFrame implements NetworkListener {
 	public ConsoleDebugWindow(MessageNode myself, NetworkActivityCaller listener) {
 		this.myself = myself;
 		this.id = myself.getID();
-		
+        logModel = new DefaultListModel<String>();
+        
 		listener.addListener(this);
 		
 		Dimension size = new Dimension(300, 500);
@@ -41,7 +42,6 @@ public class ConsoleDebugWindow extends JFrame implements NetworkListener {
         setID(id);
         add(title, BorderLayout.NORTH);
         
-        logModel = new DefaultListModel<String>();
         JList log = new JList<String>(logModel);
         
         scroll = new JScrollPane(log);

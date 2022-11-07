@@ -48,7 +48,8 @@ public class Client extends NetworkActivityCaller implements MessageNode {
             		if(!attemptConnect())
             			throw new Exception("Unable to connect to myself... for some reason");
         		} catch (Exception e) {
-        			throw new Exception("Starting up the server failed!");
+        			e.printStackTrace();
+        			throw new Exception("Starting up the server failed! Try changing your port!");
         		}
     		} else {
     			throw new Exception("No Server Found");

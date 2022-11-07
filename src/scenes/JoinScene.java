@@ -72,7 +72,8 @@ public class JoinScene extends Scene implements NetworkListener {
 		
 		enterBattleScene();
 		
-		Server.server.sendMessage("start battle");
+		System.out.println("telling everyone to enter battle mode but " + myPlayerID);
+		Server.server.sendMessageToAllBut("start battle", myPlayerID);
 	}
 	
 	public void enterBattleScene() {

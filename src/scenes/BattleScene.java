@@ -59,7 +59,6 @@ public class BattleScene extends Scene implements NetworkListener {
 		ui = new BattleBoardUI();
 		WindowHolder.setPanel(ui);
 		
-		
 		// if we are the server (aka we are spectating)
 		if(playerID == null) {
 			Server.server.addListener(this);
@@ -120,10 +119,10 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 
 	@Override
-	public void onMessage(Message message) {	
+	public void onMessage(Message message) {
+		System.out.println("message: " + message);
 		// client received info about other client's position
 		if(message.is("rPos")) {
-			System.out.println("recieved pos from " + message);
 			updateTankPos(message.getArg(0), message.doubleArg(1), message.doubleArg(2));
 		}
 		// server receieved info about client's position
@@ -144,11 +143,15 @@ public class BattleScene extends Scene implements NetworkListener {
 	public void onSentMessage(Message message) {}
 	
 	private void updateTankPos(String id, double x, double y) {
+		if(id.equals(playerID))
+			return;
 		players.get(id).setX(x);
 		players.get(id).setY(y);
 	}
 	
 	private void updateTankDir(String id, double dir) {
+		if(id.equals(playerID))
+			return;
 		players.get(id).setDirection(dir);
 	}
 
