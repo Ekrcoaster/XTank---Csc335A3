@@ -12,6 +12,9 @@ retPlayerList
 
 start <battle>
 	This will tell all of the clients to switch to the battle
+	
+retMyID <id>
+	This will return the ID of the client asking
 
 
  -- CLIENT -> SERVER --
@@ -21,3 +24,6 @@ join <clientName>
  
 playerList
 	This will ask the server for the list of current players's IDs and names
+
+myID
+	This will ask the server for the client's ID.

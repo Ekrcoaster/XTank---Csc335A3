@@ -25,11 +25,11 @@ public class JoinScene extends Scene implements NetworkListener {
 	public String myPlayerID;
 	public String myPlayerName;
 	
-	public JoinScene(boolean client, boolean server, String playerID, String playerName) {
+	public JoinScene(boolean client, boolean server, String playerName) {
 		this.client = client;
 		this.server = server;
 
-		this.myPlayerID = playerID;
+		this.myPlayerID = null;
 		this.myPlayerName = playerName;
 	}
 
@@ -52,6 +52,10 @@ public class JoinScene extends Scene implements NetworkListener {
 			// since this is just the client, ask for the player list to catch up
 			Client.client.sendMessage("playerList");
 		}
+
+		// ask for my ID just to make sure
+		if(client)
+			Client.client.sendMessage("myID");
 	}
 
 	/*
@@ -100,6 +104,12 @@ public class JoinScene extends Scene implements NetworkListener {
 			if(message.getArg(0).equals("battle")) {
 				enterBattleScene();
 			}
+		}
+		
+		// set the ID
+		if(message.is("retMyID")) {
+			myPlayerID = message.getArg(0);
+			System.out.println("my id " + myPlayerID);
 		}
 	}
 

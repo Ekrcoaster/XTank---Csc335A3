@@ -35,7 +35,7 @@ public class TitleScene extends Scene {
 				Client c = new Client(server, address, port, name.replace(" ", "_"));
 				
 				// finally, swap the scenes to the join scene
-				SceneManager.setScene(new JoinScene(client, server, c.id, name));
+				SceneManager.setScene(new JoinScene(client, server, name));
 				
 			} catch (Exception e) {
 				ui.pushError(e);
@@ -46,7 +46,7 @@ public class TitleScene extends Scene {
 		} else if(server) {
 			try {
 				new Server(port);
-				SceneManager.setScene(new JoinScene(client, server, null, null));
+				SceneManager.setScene(new JoinScene(client, server, null));
 				
 			} catch (Exception e) {
 				ui.pushError(e);
