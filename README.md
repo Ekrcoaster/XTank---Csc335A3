@@ -1,3 +1,13 @@
+# Nov 7th
+I've added the mutliplayer functionality completely! You can now run **boot.java** and you'll be prompted with the game creation screen, then a place to join in, then you can being the game!
+
+The way this works is every server/client has a running instance of the battle, the client will tell the server what changes the player has made, the server will reflect that and tell the rest of the clients what has been made.
+
+Collisions will be calculated on the player's end, its not the most secure, but its the simplest.
+Bullet impacts will be calculated on the server, however. Since bullets aren't attached to a single client. Once a tank has been shot, it'll alert all of the clients of the health change.
+I haven't actually added these yet, but i will soon.
+
+I'm going to start working on the collision system and maps in a seperate branch. I'll update this when its done.
 
 # Nov 6th
 I've added a lot more server/client backend stuff, you can now add the **NetworkListener** interface to your class, then call **_Client.client.addListener(this);_**  to start listening for client messages, or **_Server.server.addListener(this);_** to start listening for server messages. I've modified how the debug consoles work to follow this model.

@@ -15,6 +15,18 @@ start <battle>
 	
 retMyID <id>
 	This will return the ID of the client asking
+	
+rPos <playerId> <x> <y>
+	Message from the server: update this player's position
+	
+rDir <playerId> <x> <y>
+	Message from the server: update this player's rotation
+
+rBullet <playerId> <bulletType> <x> <y> <dir>
+	Message from the server: create a bullet here and shoot it
+
+
+
 
 
  -- CLIENT -> SERVER --
@@ -27,3 +39,12 @@ playerList
 
 myID
 	This will ask the server for the client's ID.
+	
+sPos <x> <y>
+	This will tell the server the client's new tank pos
+	
+sDir <x> <y>
+	This will tell the server the client's new rotation
+
+sBullet <bulletType> <x> <y> <dir>
+	This will tell the server that a bullet has been shot
