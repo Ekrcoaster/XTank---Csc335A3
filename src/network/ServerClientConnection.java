@@ -110,6 +110,9 @@ public class ServerClientConnection implements Runnable, MessageNode {
 		if(message.is("playerList")) {
 			sendMessage("retPlayerList " + Server.server.constructPlayerList());
 		}
+		
+		if(message.is("myID"))
+			sendMessage("retMyID " + id);
 	}
 	
 	@Override

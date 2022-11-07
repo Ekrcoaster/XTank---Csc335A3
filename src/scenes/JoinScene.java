@@ -45,17 +45,20 @@ public class JoinScene extends Scene implements NetworkListener {
 			
 			// because we are already the server, we can just ask for the player list ourselves
 			populatePlayerList(Server.server.constructPlayerList());
+			
+			// also just ask for the client's id directly, since id will automatically be set
+			if(client)
+				this.myPlayerID = Client.client.id;
 		}
 		else if(client) {
 			Client.client.addListener(this);
 			
 			// since this is just the client, ask for the player list to catch up
 			Client.client.sendMessage("playerList");
-		}
 
-		// ask for my ID just to make sure
-		if(client)
+			// ask for my ID just to make sure
 			Client.client.sendMessage("myID");
+		}
 	}
 
 	/*
@@ -78,12 +81,15 @@ public class JoinScene extends Scene implements NetworkListener {
 	
 	public void enterBattleScene() {
 		// if my player ID is real, it is gonna be in the list of playerIDs, so remove it
-		if(client) {
+		
+		System.out.println(myPlayerID + " " + myPlayerName);
+		
+		if(playerIDs.contains(myPlayerID)) {
 			int index = playerIDs.indexOf(myPlayerID);
 			playerIDs.remove(index);
 			playerNames.remove(index);
 		}
-				
+		
 		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames);
 		SceneManager.setScene(scene);
 	}
@@ -91,6 +97,7 @@ public class JoinScene extends Scene implements NetworkListener {
 	@Override
 	public void onMessage(Message message) {
 		if(message.is("join")) {
+			System.out.println("joined " + message);
 			playerIDs.add(message.fromID);
 			playerNames.add(message.getArg(0));
 			ui.addPlayerName(message.getArg(0));
@@ -109,6 +116,9 @@ public class JoinScene extends Scene implements NetworkListener {
 		// set the ID
 		if(message.is("retMyID")) {
 			myPlayerID = message.getArg(0);
+			// make sure this value isn't null anymore
+			Client.client.id = myPlayerID;
+			
 			System.out.println("my id " + myPlayerID);
 		}
 	}
