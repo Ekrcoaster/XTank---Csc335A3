@@ -12,8 +12,10 @@ import java.util.Map;
 import _main._Settings;
 import battle.tanks.GenericTank;
 import battle.tanks.Tank;
+import network.Client;
 import network.Message;
 import network.NetworkListener;
+import network.Server;
 import ui.BattleBoardUI;
 import ui.WindowHolder;
 
@@ -56,6 +58,14 @@ public class BattleScene extends Scene implements NetworkListener {
 		// create the scenes board UI
 		ui = new BattleBoardUI();
 		WindowHolder.setPanel(ui);
+		
+		
+		// if we are the server (aka we are spectating)
+		if(playerID == null) {
+			Server.server.addListener(this);
+		} else { // if not we are a client
+			Client.client.addListener(this);
+		}
 		
 		render();
 		
@@ -111,24 +121,35 @@ public class BattleScene extends Scene implements NetworkListener {
 
 	@Override
 	public void onMessage(Message message) {	
+		// client received info about other client's position
 		if(message.is("rPos")) {
 			System.out.println("recieved pos from " + message);
-			String id = message.getArg(0);
-			double x = message.doubleArg(1);
-			double y = message.doubleArg(2);
-			
-			players.get(id).setX(x);
-			players.get(id).setY(y);
+			updateTankPos(message.getArg(0), message.doubleArg(1), message.doubleArg(2));
+		}
+		// server receieved info about client's position
+		if(message.is("sPos")) {
+			updateTankPos(message.fromID, message.doubleArg(0), message.doubleArg(1));
 		}
 		
-		if(message.is("rDir")) {
-			String id = message.getArg(0);
-			double dir = message.doubleArg(1);
-			
-			players.get(id).setDirection(dir);
-		}
+		// server -> client direction update
+		if(message.is("rDir"))
+			updateTankDir(message.getArg(0), message.doubleArg(1));
+		
+		// client -> server direction update
+		if(message.is("sDir"))
+			updateTankDir(message.fromID, message.doubleArg(0));
 	}
 
 	@Override
-	public void onSentMessage(Message message) { }
+	public void onSentMessage(Message message) {}
+	
+	private void updateTankPos(String id, double x, double y) {
+		players.get(id).setX(x);
+		players.get(id).setY(y);
+	}
+	
+	private void updateTankDir(String id, double dir) {
+		players.get(id).setDirection(dir);
+	}
+
 }
