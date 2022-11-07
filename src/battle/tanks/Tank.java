@@ -11,13 +11,16 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 
+import _main._Settings;
 import battle.bullets.Bullet;
 import network.Client;
 import network.NetworkListener;
 import scenes.BattleScene;
 
 public abstract class Tank {
+	BattleScene scene;
 	public boolean isServerControlled;
+	
 	protected String id, name;
 	protected double x, y;
 	protected double direction; //degrees
@@ -29,10 +32,10 @@ public abstract class Tank {
 
 	double cachedSin, cachedCos;
 	private double bulletActiveCooldown;
-	public HashSet<Bullet> shotBullets;
 	
-	public Tank(String id, String name, boolean isServerControlled) {
+	public Tank(String id, String name, boolean isServerControlled, BattleScene scene) {
 		this.isServerControlled = isServerControlled;
+		this.scene = scene;
 		this.id = id;
 		this.name = name;
 		
@@ -43,7 +46,6 @@ public abstract class Tank {
 		this.health = 0;
 		this.moveSpeed = 0;
 		this.rotateSpeed = 0;
-		this.shotBullets = new HashSet<Bullet>();
 		this.bulletSpeedCooldown = 0;
 		this.bulletActiveCooldown = 0;
 	}
@@ -83,12 +85,8 @@ public abstract class Tank {
 		if(isServerControlled)
 			return;
 		
-		for(Bullet bullet : shotBullets) {
-			bullet.update();
-		}
-		
 		if(bulletActiveCooldown > 0)
-			bulletActiveCooldown -= 1.0 / BattleScene.FPS;
+			bulletActiveCooldown -= 1.0 / _Settings.BATTLE_FPS;
 	}
 	
 	/*
@@ -115,8 +113,10 @@ public abstract class Tank {
 			savePositionToServer();
 		}
 		if(keysDown.contains(KeyEvent.VK_SPACE) && bulletActiveCooldown <= 0) {
-			shotBullets.add(shoot(rotatePoint(0, -size*2).offset(x, y), direction));
+			Bullet shot = shoot(rotatePoint(0, -size*2).offset(x, y), direction);
+			scene.bullets.add(shot);
 			bulletActiveCooldown = bulletSpeedCooldown;
+			sendMessage("sBullet " + shot.getType() + " " + x + " " + y + " " + direction);
 		}
 	}
 

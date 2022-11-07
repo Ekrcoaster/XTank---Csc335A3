@@ -29,8 +29,11 @@ public class JoinSceneUI extends JPanel {
 	
 	JButton beginGameButton;
 	
+	boolean server;
+	
 	public JoinSceneUI(boolean client, boolean server, JoinScene scene) {
 		this.scene = scene;
+		this.server = server;
 		setLayout(null);
 
         JLabel playerLabel = new JLabel("Connected Players:");
@@ -58,7 +61,7 @@ public class JoinSceneUI extends JPanel {
         int buttonWidth = 200;
         beginGameButton = new JButton(server ? "Begin Game" : "Waiting for server to begin...");
         beginGameButton.setBounds((int)(_Settings.windowSize.width*0.5 - buttonWidth * 0.5), _Settings.windowSize.height - 150, buttonWidth, 60);
-        beginGameButton.setEnabled(server);
+        beginGameButton.setEnabled(server && playerListModel.size() > 0);
         beginGameButton.addActionListener(l -> {
         	scene.beginGame();
         });
@@ -67,5 +70,6 @@ public class JoinSceneUI extends JPanel {
 
 	public void addPlayerName(String name) {
 		playerListModel.addElement(name.replace("_", " "));
+		beginGameButton.setEnabled(server && playerListModel.size() > 0);
 	}
 }

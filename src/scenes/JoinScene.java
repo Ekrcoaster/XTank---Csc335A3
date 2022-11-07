@@ -40,6 +40,7 @@ public class JoinScene extends Scene implements NetworkListener {
 		playerNames = new ArrayList<String>();
 		WindowHolder.setPanel(ui);
 		
+		// if we are a client
 		if(client) {
 			Client.client.addListener(this);
 			
@@ -49,6 +50,7 @@ public class JoinScene extends Scene implements NetworkListener {
 			// ask for my ID just to make sure
 			Client.client.sendMessage("myID");
 			
+		// if we are a server ONLY
 		} else if(server) {
 			Server.server.addListener(this);
 
@@ -72,14 +74,11 @@ public class JoinScene extends Scene implements NetworkListener {
 		
 		enterBattleScene();
 		
-		System.out.println("telling everyone to enter battle mode but " + myPlayerID);
 		Server.server.sendMessageToAllBut("start battle", myPlayerID);
 	}
 	
 	public void enterBattleScene() {
 		// if my player ID is real, it is gonna be in the list of playerIDs, so remove it
-		
-		System.out.println(myPlayerID + " " + myPlayerName);
 		
 		if(playerIDs.contains(myPlayerID)) {
 			int index = playerIDs.indexOf(myPlayerID);
@@ -87,8 +86,29 @@ public class JoinScene extends Scene implements NetworkListener {
 			playerNames.remove(index);
 		}
 		
-		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames);
+		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames, server);
 		SceneManager.setScene(scene);
+	}
+
+	/*
+	 * This will take in the server generated list of existing players and will decode them
+	 * into the playerIDs list and the playerNames list
+	 */
+	public void populatePlayerList(String listReceived) {
+		String[] pieces = listReceived.split(" ");
+		
+		// if there is just 1 entree, ignore because its not valid
+		if(pieces.length < 2) return;
+		
+		// odd entrees are IDs, even entrees are names
+		for(int i = 0; i < pieces.length; i++) {
+			if(i % 2 == 0)
+				playerIDs.add(pieces[i]);
+			else {
+				playerNames.add(pieces[i]);
+				ui.addPlayerName(pieces[i]);
+			}
+		}
 	}
 
 	@Override
@@ -107,10 +127,12 @@ public class JoinScene extends Scene implements NetworkListener {
 			ui.addPlayerName(message.getArg(1));
 		}
 		
+		// if the server responded with the player list
 		if(message.is("retPlayerList")) {
 			populatePlayerList(message.joinedArgs());
 		}
 		
+		// if the server told us to go to the battle scene
 		if(message.is("start")) {
 			if(message.getArg(0).equals("battle")) {
 				enterBattleScene();
@@ -122,21 +144,6 @@ public class JoinScene extends Scene implements NetworkListener {
 			myPlayerID = message.getArg(0);
 			// make sure this value isn't null anymore
 			Client.client.id = myPlayerID;
-			
-			System.out.println("my id " + myPlayerID);
-		}
-	}
-
-	
-	public void populatePlayerList(String listReceived) {
-		String[] pieces = listReceived.split(" ");
-		for(int i = 0; i < pieces.length; i++) {
-			if(i % 2 == 0)
-				playerIDs.add(pieces[i]);
-			else {
-				playerNames.add(pieces[i]);
-				ui.addPlayerName(pieces[i]);
-			}
 		}
 	}
 

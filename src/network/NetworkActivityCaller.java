@@ -7,19 +7,21 @@ package network;
 import java.util.ArrayList;
 
 public abstract class NetworkActivityCaller {
-public static ArrayList<NetworkListener> listeners;
+	public static ArrayList<NetworkListener> listeners;
 	
+	// add a new listener to the list
 	public void addListener(NetworkListener listener) {
 		if(listeners == null)
 			listeners = new ArrayList<NetworkListener>();
 		listeners.add(listener);
-		System.out.println(listener);
 	}
 	
+	// remove the listener from the list
 	public void removeListener(NetworkListener listener) {
 		listeners.remove(listener);
 	}
 	
+	// call the listeners on message
 	public void callListenersOnMessage(Message message) {
 		if(listeners == null) return;
 
@@ -29,6 +31,7 @@ public static ArrayList<NetworkListener> listeners;
 		}
 	}
 	
+	// call the listeners on message send
 	public void callListenersOnSentMessage(Message message) {
 		if(listeners == null) return;
 		

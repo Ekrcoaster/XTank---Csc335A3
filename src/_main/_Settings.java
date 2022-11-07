@@ -15,9 +15,10 @@ import java.net.UnknownHostException;
 public class _Settings {
 	public static final String defaultServerAdress = "localhost";
 	public static final int defaultPort = 58901;
-	public static boolean createDebugConsoles = true;
+	public static boolean createDebugConsoles = false;
 	public static boolean clientCreatesServer = true;
 	public static Dimension windowSize = new Dimension(900, 600);
+	public static final int BATTLE_FPS = 30;
 	
 	public static String getIPAddress() {
 		InetAddress ip;

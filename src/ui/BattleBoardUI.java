@@ -28,9 +28,11 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 	Graphics graphics;
 	HashSet<Integer> keysDown;
 	Collection<Tank> tanks;
+	HashSet<Bullet> bullets;
 	
 	public BattleBoardUI() {
 		this.tanks = new ArrayList<Tank>();
+		this.bullets = new HashSet<Bullet>();
 		this.keysDown = new HashSet<Integer>();
 		setLayout(new BorderLayout(0, 0));
 		
@@ -40,11 +42,11 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		requestFocus();
 
 		addKeyListener(this);
-		System.out.println("a");
 	}
 
-	public void render(Collection<Tank> tanks) {
+	public void render(Collection<Tank> tanks, HashSet<Bullet> bullets) {
 		this.tanks = tanks;
+		this.bullets = bullets;
 		if(!isFocusOwner()) {
 			requestFocusInWindow();
 			requestFocus();
@@ -60,10 +62,10 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		
 		for(Tank tank : tanks) {
 			tank.render(g);
-			for(Bullet bullet : tank.shotBullets)
-				bullet.render(g);
 		}
-		
+		for(Bullet bullet : bullets) {
+			bullet.render(g);
+		}
 	}
 	
 	public HashSet<Integer> getKeysDown() {

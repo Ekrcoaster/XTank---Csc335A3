@@ -9,8 +9,8 @@ import java.awt.Graphics;
 
 public class GenericBullet extends Bullet {
 
-	public GenericBullet(double x, double y, double direction) {
-		super(x, y, direction);
+	public GenericBullet(String ownerID, double x, double y, double direction) {
+		super(ownerID, x, y, direction);
 		this.speed = 10;
 	}
 
@@ -19,4 +19,7 @@ public class GenericBullet extends Bullet {
 		g.setColor(Color.white);
 		g.fillRect((int)Math.round(x), (int)Math.round(y), 5, 5);
 	}
+
+	@Override
+	public String getType() { return "generic"; }
 }

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import _main._Settings;
 import network.Client;
+import network.Message;
 
 public class SceneManager {
 	public static Scene activeScene;
@@ -29,6 +30,11 @@ public class SceneManager {
 		tempPlayerNames.add("Taylor Swift");
 		tempPlayerIDS.add("sdsdsd");
 		tempPlayerNames.add("Adele");
-		setScene(new BattleScene("you", "you!", tempPlayerIDS, tempPlayerNames));
+		BattleScene scene = new BattleScene(Client.client.id, "you!", tempPlayerIDS, tempPlayerNames, true);
+		setScene(scene);
+		// place the tanks at random spots
+		scene.onMessage(new Message("sPos 500 500", "000"));
+		scene.onMessage(new Message("sPos 300 400", "afcfs"));
+		scene.onMessage(new Message("sPos 100 200", "sdsdsd"));
 	}
 }

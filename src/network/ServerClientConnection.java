@@ -39,7 +39,6 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	public void run() {
 		try 
 		{
-			System.out.println(id + " asking");
 			// ask the server if it is okay if my player joins
 			if(!Server.server.playerAttemptConnect(id)) {
 				System.out.println("The server denied your connection!");
@@ -59,11 +58,12 @@ public class ServerClientConnection implements Runnable, MessageNode {
 				String command = getInput().nextLine();
 				Message message = new Message(command, id);
 				
-				
 				// handle an exit command
 				if (message.is("exit"))
 					return;
 
+				// the order here doesn't matter, i chose to tell the server first before myself
+				// so the debug consoles look more readable
 				Server.server.messageReceived(message);
 				messageReceived(message);
 			}
@@ -72,10 +72,6 @@ public class ServerClientConnection implements Runnable, MessageNode {
 		{
 			e.printStackTrace();
 		}
-	}
-	
-	public void setSocket(Socket socket) {
-		this.socket = socket;
 	}
 
 	/*
@@ -101,7 +97,7 @@ public class ServerClientConnection implements Runnable, MessageNode {
 		}
 		
 		if(message.is("sPos")) {
-			Server.server.sendMessageToAllBut("rPos " + id + " " + message.joinedArgs(), id);
+			//Server.server.sendMessageToAllBut("rPos " + id + " " + message.joinedArgs(), id);
 		}
 
 		if(message.is("sDir")) {
@@ -123,6 +119,10 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public void setSocket(Socket socket) {
+		this.socket = socket;
 	}
 
 	public void setInput(Scanner input) { this.input = input;}

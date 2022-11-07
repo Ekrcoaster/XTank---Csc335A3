@@ -8,13 +8,15 @@ package battle.bullets;
 import java.awt.Graphics;
 
 public abstract class Bullet {
+	public String ownerID;
 	public double direction;
 	public double speed;
 	public double x, y;
 	
 	double cachedSin, cachedCos;
 	
-	public Bullet(double x, double y, double direction) {
+	public Bullet(String ownerID, double x, double y, double direction) {
+		this.ownerID = ownerID;
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
@@ -30,4 +32,5 @@ public abstract class Bullet {
 	}
 	
 	public abstract void render(Graphics g);
+	public abstract String getType();
 }

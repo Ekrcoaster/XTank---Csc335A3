@@ -6,11 +6,12 @@ package battle.tanks;
 
 import battle.bullets.Bullet;
 import battle.bullets.GenericBullet;
+import scenes.BattleScene;
 
 public class GenericTank extends Tank {
 
-	public GenericTank(String id, String name, boolean isServerControlled) {
-		super(id, name, isServerControlled);
+	public GenericTank(String id, String name, boolean isServerControlled, BattleScene scene) {
+		super(id, name, isServerControlled, scene);
 		this.health = 10;
 		this.moveSpeed = 5;
 		this.rotateSpeed = 3;
@@ -20,6 +21,6 @@ public class GenericTank extends Tank {
 
 	@Override
 	public Bullet shoot(IntPoint origin, double direction) {
-		return new GenericBullet(origin.x, origin.y, direction);
+		return new GenericBullet(this.id, origin.x, origin.y, direction);
 	}
 }

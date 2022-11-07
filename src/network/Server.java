@@ -46,7 +46,6 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 		this.port = port;
 
 		listener = new ServerSocket(port);
-		System.out.println("Server started on port " + port + "\nIP: " + InetAddress.getLocalHost());
 		
 		pool = Executors.newFixedThreadPool(200);
 		pool.execute(() -> newPlayerListenerServerThread());
