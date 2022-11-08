@@ -7,10 +7,13 @@ package battle.bullets;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import battle.map.ColliderHitPoint;
+import scenes.BattleScene;
+
 public class GenericBullet extends Bullet {
 
-	public GenericBullet(String ownerID, double x, double y, double direction) {
-		super(ownerID, x, y, direction);
+	public GenericBullet(BattleScene scene, String ownerID, double x, double y, double direction) {
+		super(scene, ownerID, x, y, direction);
 		this.speed = 10;
 	}
 
@@ -22,4 +25,9 @@ public class GenericBullet extends Bullet {
 
 	@Override
 	public String getType() { return "generic"; }
+
+	@Override
+	public void onMapCollision(ColliderHitPoint point) {
+		scene.destroyBullet(this);
+	}
 }

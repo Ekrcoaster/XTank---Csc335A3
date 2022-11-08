@@ -21,6 +21,6 @@ public class GenericTank extends Tank {
 
 	@Override
 	public Bullet shoot(IntPoint origin, double direction) {
-		return new GenericBullet(this.id, origin.x, origin.y, direction);
+		return new GenericBullet(scene, this.id, origin.x, origin.y, direction);
 	}
 }

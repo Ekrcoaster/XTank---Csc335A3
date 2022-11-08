@@ -7,7 +7,12 @@ package battle.bullets;
 
 import java.awt.Graphics;
 
-public abstract class Bullet {
+import battle.map.ColliderHitPoint;
+import scenes.BattleScene;
+import ui.Renderable;
+
+public abstract class Bullet implements Renderable {
+	BattleScene scene;
 	public String ownerID;
 	public double direction;
 	public double speed;
@@ -15,22 +20,40 @@ public abstract class Bullet {
 	
 	double cachedSin, cachedCos;
 	
-	public Bullet(String ownerID, double x, double y, double direction) {
+	public Bullet(BattleScene scene, String ownerID, double x, double y, double direction) {
+		this.scene = scene;
 		this.ownerID = ownerID;
 		this.x = x;
 		this.y = y;
-		this.direction = direction;
 		this.speed = 0;
-		
-		cachedSin = Math.sin(Math.toRadians(direction));
-		cachedCos = Math.cos(Math.toRadians(direction));
+		setDirection(direction);
 	}
 	
-	public void update() {
+	public void setDirection(double direction) {
+		cachedSin = Math.sin(Math.toRadians(direction));
+		cachedCos = Math.cos(Math.toRadians(direction));
+		
+		this.direction = direction;
+	}
+	
+	protected void updateCollisions() {
+		// calculate collisions for the map
+		ColliderHitPoint point = scene.map.calculateCollisions(x, y, 0, 0);
+		if(point.hit)
+			onMapCollision(point);
+	}
+	
+	protected void updateMovement() {
 		x += cachedSin * speed;
 		y -= cachedCos * speed;
 	}
 	
+	public void update() {
+		updateMovement();
+		updateCollisions();
+	}
+	
 	public abstract void render(Graphics g);
+	public abstract void onMapCollision(ColliderHitPoint point);
 	public abstract String getType();
 }

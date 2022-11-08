@@ -21,18 +21,17 @@ import javax.swing.JPanel;
 
 import battle.tanks.Tank;
 import battle.bullets.*;
+import battle.map.RenderColliderRect;
 
 public class BattleBoardUI extends JPanel implements KeyListener{
 	
 	BufferStrategy bufferStrategy;
 	Graphics graphics;
 	HashSet<Integer> keysDown;
-	Collection<Tank> tanks;
-	HashSet<Bullet> bullets;
+	ArrayList<Renderable> renderQueue;
 	
 	public BattleBoardUI() {
-		this.tanks = new ArrayList<Tank>();
-		this.bullets = new HashSet<Bullet>();
+		this.renderQueue = new ArrayList<Renderable>();
 		this.keysDown = new HashSet<Integer>();
 		setLayout(new BorderLayout(0, 0));
 		
@@ -44,9 +43,8 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		addKeyListener(this);
 	}
 
-	public void render(Collection<Tank> tanks, HashSet<Bullet> bullets) {
-		this.tanks = tanks;
-		this.bullets = bullets;
+	public void render(ArrayList<Renderable> renderQueue) {
+		this.renderQueue = renderQueue;
 		if(!isFocusOwner()) {
 			requestFocusInWindow();
 			requestFocus();
@@ -60,11 +58,8 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		g.setColor(Color.black);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
-		for(Tank tank : tanks) {
-			tank.render(g);
-		}
-		for(Bullet bullet : bullets) {
-			bullet.render(g);
+		for(Renderable item : renderQueue) {
+			item.render(g);
 		}
 	}
 	

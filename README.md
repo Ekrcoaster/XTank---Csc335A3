@@ -9,6 +9,24 @@ I haven't actually added these yet, but i will soon.
 
 I'm going to start working on the collision system and maps in a seperate branch. I'll update this when its done.
 
+---
+So its done, you can create map files in the maps folder, theres a tutorial in empty.txt
+I haven't tested them on multiplayer yet, but it should work perfectly as its all client side.
+
+Tomorow I'll add the interface for selecting maps and other tanks!
+
+Todo still: (not really in order)
+- add the UI for chosing tanks and maps (ill do this tomorrow)
+- bullet collisions with tanks (i'll do this tomorrow, will just use the collision system)
+- Tank health and deaths (prob after the server stuff has been added)
+- Different types of tanks and bullets and maps (should be easily, we should do this last)
+- Maybe add a choose your tank to the player join waiting list
+- Maybe some sort of like player list to show who is alive
+- Floating health bars above the tanks in game
+- Make sure everything meets the spec requirement
+
+_-Ethan_
+
 # Nov 6th
 I've added a lot more server/client backend stuff, you can now add the **NetworkListener** interface to your class, then call **_Client.client.addListener(this);_**  to start listening for client messages, or **_Server.server.addListener(this);_** to start listening for server messages. I've modified how the debug consoles work to follow this model.
 

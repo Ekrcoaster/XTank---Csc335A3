@@ -86,7 +86,7 @@ public class JoinScene extends Scene implements NetworkListener {
 			playerNames.remove(index);
 		}
 		
-		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames, server);
+		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames, server, "empty");
 		SceneManager.setScene(scene);
 	}
 

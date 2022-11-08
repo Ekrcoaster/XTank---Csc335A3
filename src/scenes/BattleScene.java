@@ -5,6 +5,7 @@
  */
 package scenes;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,19 +14,19 @@ import java.util.Map;
 import _main._Settings;
 import battle.bullets.Bullet;
 import battle.bullets.GenericBullet;
+import battle.map.*;
 import battle.tanks.GenericTank;
 import battle.tanks.Tank;
 import network.Client;
 import network.Message;
 import network.NetworkListener;
 import network.Server;
-import ui.BattleBoardUI;
-import ui.WindowHolder;
+import ui.*;
 
 public class BattleScene extends Scene implements NetworkListener {
 
 	public HashMap<String, Tank> players;
-	public HashSet<Bullet> bullets;
+	public ArrayList<Bullet> bullets;
 	
 	public boolean isServer;
 	public BattleBoardUI ui;
@@ -34,11 +35,17 @@ public class BattleScene extends Scene implements NetworkListener {
 	public boolean exit;
 	Thread gameTickThread;
 	
-	public BattleScene(String playerID, String playerName, ArrayList<String> otherPlayerIDs, ArrayList<String> otherPlayerNames, boolean isServer) {
+	public BattleMap map;
+	ArrayList<Renderable> itemsToRender;
+	
+	public BattleScene(String playerID, String playerName, ArrayList<String> otherPlayerIDs, ArrayList<String> otherPlayerNames, boolean isServer, String mapName) {
 		this.players = new HashMap<String, Tank>();
-		this.bullets = new HashSet<Bullet>();
+		this.bullets = new ArrayList<Bullet>();
+		this.itemsToRender = new ArrayList<Renderable>();
 		this.playerID = playerID;
 		this.isServer = isServer;
+		
+		this.map = new BattleMap(mapName, _Settings.windowSize.width - 15, _Settings.windowSize.height - 40);
 		
 		// create the client's tank (if this instance is even a client)
 		if(playerID != null)
@@ -76,6 +83,15 @@ public class BattleScene extends Scene implements NetworkListener {
 		
 		if(playerID != null)
 			placeTankAtRandomPosition(players.get(playerID));
+		
+		// add all tanks to render queue
+		for(Tank tank : players.values()) {
+			addToRenderQueue(tank);
+		}
+		
+		for(Renderable item : map.getRenderables()) {
+			addToRenderQueue(item);
+		}
 		
 		startGameLoop();
 	}
@@ -117,13 +133,13 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 		
 		// update the bullets
-		for(Bullet bullet : bullets) {
-			bullet.update();
+		for(int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).update();
 		}
 	}
 	
 	private void render() {
-		ui.render(players.values(), bullets);
+		ui.render(itemsToRender);
 	}
 	
 	/*
@@ -198,6 +214,11 @@ public class BattleScene extends Scene implements NetworkListener {
 	public void placeTankAtRandomPosition(Tank tank) {
 		tank.setX((Math.random() * _Settings.windowSize.getWidth() * 0.75)+  _Settings.windowSize.getWidth() * 0.15);
 		tank.setY((Math.random() * _Settings.windowSize.getHeight() * 0.75) +  _Settings.windowSize.getHeight() * 0.15);
+		
+		// check for collisions
+		ColliderHitPoint point = tank.calculateCollisions();
+		tank.setX(point.x);
+		tank.setY(point.y);
 		tank.savePositionToServer();
 	}
 
@@ -209,7 +230,20 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 	
 	private Bullet createBullet(String playerID, String bulletType, double x, double y, double direction) {
-		return new GenericBullet(playerID, x, y, direction);
+		return new GenericBullet(this, playerID, x, y, direction);
+	}
+	
+	public void destroyBullet(Bullet bullet) {
+		bullets.remove(bullet);
+		removeFromRenderQueue(bullet);
+	}
+	
+	public void addToRenderQueue(Renderable item) {
+		itemsToRender.add(item);
+	}
+	
+	public void removeFromRenderQueue(Renderable item) {
+		itemsToRender.remove(item);
 	}
 	
 	@Override

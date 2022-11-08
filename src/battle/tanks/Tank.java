@@ -13,11 +13,13 @@ import java.util.HashSet;
 
 import _main._Settings;
 import battle.bullets.Bullet;
+import battle.map.ColliderHitPoint;
 import network.Client;
 import network.NetworkListener;
 import scenes.BattleScene;
+import ui.Renderable;
 
-public abstract class Tank {
+public abstract class Tank implements Renderable {
 	BattleScene scene;
 	public boolean isServerControlled;
 	
@@ -64,6 +66,14 @@ public abstract class Tank {
 		// move (x,y) using sin and cos, this will move it forward in the desired direction
 		x += cachedSin * amount;
 		y -= cachedCos * amount;
+		
+		var result = calculateCollisions();
+		x = result.x + size;
+		y = result.y + size;
+	}
+	
+	public ColliderHitPoint calculateCollisions() {
+		return scene.map.calculateCollisions(x - size, y - size, size*2, size*2);
 	}
 	
 	/*
@@ -115,6 +125,7 @@ public abstract class Tank {
 		if(keysDown.contains(KeyEvent.VK_SPACE) && bulletActiveCooldown <= 0) {
 			Bullet shot = shoot(rotatePoint(0, -size*2).offset(x, y), direction);
 			scene.bullets.add(shot);
+			scene.addToRenderQueue(shot);
 			bulletActiveCooldown = bulletSpeedCooldown;
 			sendMessage("sBullet " + shot.getType() + " " + x + " " + y + " " + direction);
 		}
@@ -137,10 +148,11 @@ public abstract class Tank {
 	// -------------------
 	
 	public void render(Graphics g) {
-		g.setColor(Color.white);
+		double gunLength = 1-(bulletActiveCooldown / (double)bulletSpeedCooldown)*0.4+0.3;
+		g.setColor(getColor());
 		drawRotatedPolygon(new IntPoint[] {
-				rotatePoint(-size * 0.3, -size - size).offset(x, y),
-				rotatePoint(size * 0.3, -size - size).offset(x, y),
+				rotatePoint(-size * 0.3, -size - size * gunLength).offset(x, y),
+				rotatePoint(size * 0.3, -size - size * gunLength).offset(x, y),
 				rotatePoint(size * 0.3, size - size).offset(x, y),
 				rotatePoint(-size * 0.3, size - size).offset(x, y)
 		}, g);
@@ -161,7 +173,7 @@ public abstract class Tank {
 		g.setColor(new Color(10, 10, 10));
 		g.fillRect((int)(origin.x - width*.5), (int)(origin.y - height * 0.7), width, height);
 		
-		g.setColor(isServerControlled ? Color.blue : Color.red);
+		g.setColor(getColor());
 		g.drawString(name, (int)(origin.x - width*.5), origin.y);
 	}
 
@@ -191,6 +203,11 @@ public abstract class Tank {
 	//  getters / setters
 	// -------------------
 
+	protected Color getColor() {
+		if(isServerControlled)
+			return Color.blue;
+		return Color.yellow;
+	}
 	
 	public double getX() {
 		return x;
@@ -210,6 +227,10 @@ public abstract class Tank {
 
 	public double getDirection() {
 		return direction;
+	}
+
+	public double getSize() {
+		return size;
 	}
 
 	public void setDirection(double direction) {

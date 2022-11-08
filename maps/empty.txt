@@ -1,0 +1,19 @@
+# you can make maps by adding rects
+# each line is 1 rect
+# a rect has 5 params:
+#   abs x1 y1 x2 y2
+# 
+# or you can use a width/height rect:
+#   wh x1 y1 width height
+#
+#
+# finally, add ' | ' after the rect and then add 3 more params for red, green, blue
+#
+# examples:
+#
+# 10x10 green rect starting at (5,5):
+# 	wh 5 5 10 10 | 0 255 0
+#
+#
+# (2,3,10,11) blue rect:
+#	abs 2 3 10 11 | 5 5 255

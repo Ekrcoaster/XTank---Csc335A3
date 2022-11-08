@@ -30,7 +30,7 @@ public class SceneManager {
 		tempPlayerNames.add("Taylor Swift");
 		tempPlayerIDS.add("sdsdsd");
 		tempPlayerNames.add("Adele");
-		BattleScene scene = new BattleScene(Client.client.id, "you!", tempPlayerIDS, tempPlayerNames, true);
+		BattleScene scene = new BattleScene(Client.client.id, "you!", tempPlayerIDS, tempPlayerNames, true, "map1");
 		setScene(scene);
 		// place the tanks at random spots
 		scene.onMessage(new Message("sPos 500 500", "000"));
