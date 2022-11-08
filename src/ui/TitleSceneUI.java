@@ -5,6 +5,7 @@
 package ui;
 
 import java.awt.Color;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -18,11 +19,12 @@ import scenes.TitleScene;
 public class TitleSceneUI extends JPanel {
 	
 	public TitleScene title;
-	JPanel buttonsPanel, launchSettingsPanel;
+	JPanel buttonsPanel, launchSettingsPanel, playSettingsPanel;
 	JButton[] launchModeButtons;
 	
 	IntegerField port;
 	StringField ipAddress, name;
+	DropdownField mapChooser;
 	
 	JButton playButton;
 	
@@ -34,7 +36,7 @@ public class TitleSceneUI extends JPanel {
 		this.title = title;
 		setLayout(null);
 		
-		int verticalOffset = 150;
+		int verticalOffset = 170;
 
 		// add the top buttons panel
 		add(createButtonsPanel(verticalOffset));
@@ -42,13 +44,16 @@ public class TitleSceneUI extends JPanel {
 		// add the settings panel
 		add(createLaunchSettingsPanel(verticalOffset));
 		
+		// add the play settings panel
+		add(createMapSettingsPanel(verticalOffset));
+		
 		// add the play button
 		int playWidth = 200;
 		playButton = new JButton("Play");
-		playButton.setBounds((int)(_Settings.windowSize.getWidth() * 0.5 - playWidth * 0.5), 100 + verticalOffset, playWidth, 50);
+		playButton.setBounds((int)(_Settings.windowSize.getWidth() * 0.5 - playWidth * 0.5), 150 + verticalOffset, playWidth, 50);
 		// when pressed, tell the scene to begin the servers
 		playButton.addActionListener(l -> {
-			title.beginGame(selectedPlayMode == 0 || selectedPlayMode == 2, selectedPlayMode == 1 || selectedPlayMode == 2, ipAddress.getValue(), port.getValue(), name.getValue());
+			title.beginGame(selectedPlayMode == 0 || selectedPlayMode == 2, selectedPlayMode == 1 || selectedPlayMode == 2, ipAddress.getValue(), port.getValue(), name.getValue(), mapChooser.getValue());
 		});
 		add(playButton);
 		
@@ -113,6 +118,26 @@ public class TitleSceneUI extends JPanel {
 		return launchSettingsPanel;
 	}
 	
+	public JPanel createMapSettingsPanel(int offset) {
+		playSettingsPanel = new JPanel();
+		playSettingsPanel.setBounds(100, offset+75, (int)_Settings.windowSize.getWidth()-200, 40);
+		
+		// get all of the maps from the directory
+		File directory = new File("./maps");
+		File[] files = directory.listFiles();
+		
+		// put the names into the dropdown
+		String[] names = new String[files.length];
+		for(int i = 0; i < files.length; i++) {
+			names[i] = files[i].getName().replace(".txt", "");
+		}
+		
+		mapChooser = new DropdownField("Choose your Map:", "map1", names, 100, 70, 20);
+		playSettingsPanel.add(mapChooser);
+		
+		return playSettingsPanel;
+	}
+	
 	/*
 	 * This simply creates a new document listener for the string fields, it takes up way too much space
 	 * so im defining it down here
@@ -149,6 +174,8 @@ public class TitleSceneUI extends JPanel {
 		port.setEnabled(selectedPlayMode != -1);
 		ipAddress.setEnabled(selectedPlayMode == 0);
 		name.setEnabled(selectedPlayMode != 1 && selectedPlayMode != -1);
+		
+		mapChooser.setEnabled(selectedPlayMode > 0);
 		
 		String[] buttonNames = {
 			"Select a play mode", // -1

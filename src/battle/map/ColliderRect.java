@@ -84,4 +84,9 @@ public class ColliderRect {
 	public ColliderHitPoint snapToEdgePoint(double x, double y, double width, double height) {
 		return snapToEdgePoint(new ColliderHitPoint(x, y), width, height);
 	}
+	
+	@Override
+	public String toString() {
+		return "[" + x1 + " " + y1 + " " + x2 + " " + y2 + "]";
+	}
 }

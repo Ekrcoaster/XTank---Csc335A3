@@ -8,6 +8,7 @@ package battle.bullets;
 import java.awt.Graphics;
 
 import battle.map.ColliderHitPoint;
+import battle.tanks.Tank;
 import scenes.BattleScene;
 import ui.Renderable;
 
@@ -17,6 +18,7 @@ public abstract class Bullet implements Renderable {
 	public double direction;
 	public double speed;
 	public double x, y;
+	public double damage;
 	
 	double cachedSin, cachedCos;
 	
@@ -26,6 +28,7 @@ public abstract class Bullet implements Renderable {
 		this.x = x;
 		this.y = y;
 		this.speed = 0;
+		this.damage = 0;
 		setDirection(direction);
 	}
 	
@@ -41,6 +44,7 @@ public abstract class Bullet implements Renderable {
 		ColliderHitPoint point = scene.map.calculateCollisions(x, y, 0, 0);
 		if(point.hit)
 			onMapCollision(point);
+		
 	}
 	
 	protected void updateMovement() {
@@ -53,7 +57,12 @@ public abstract class Bullet implements Renderable {
 		updateCollisions();
 	}
 	
+	protected void destroy() {
+		scene.destroyBullet(this);
+	}
+	
 	public abstract void render(Graphics g);
 	public abstract void onMapCollision(ColliderHitPoint point);
+	public abstract void onTankCollision(Tank tank);
 	public abstract String getType();
 }

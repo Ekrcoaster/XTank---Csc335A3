@@ -132,9 +132,24 @@ public class BattleScene extends Scene implements NetworkListener {
 			tank.update();
 		}
 		
-		// update the bullets
+		// update the bullets and calculate tank damage
 		for(int i = 0; i < bullets.size(); i++) {
-			bullets.get(i).update();
+			Bullet bullet = bullets.get(i);
+			bullet.update();
+			
+			// check if this bullet is colliding with any tank
+			Tank collidedWith = getCollidedTank(bullet.x, bullet.y);
+			
+			// if so, tell the tank, then calculate the damage
+			if(collidedWith != null) {
+				bullet.onTankCollision(collidedWith);
+				
+				// if we are the server, send it out to the client
+				if(isServer) {
+					collidedWith.damage(bullet.damage);
+					Server.server.sendMessage("health " + collidedWith.getID() + " " + collidedWith.getHealth());
+				}
+			}
 		}
 	}
 	
@@ -180,8 +195,13 @@ public class BattleScene extends Scene implements NetworkListener {
 			if(message.is("rDir"))
 				updateTankDir(message.getArg(0), message.doubleArg(1));
 			
+			// server -> client a bullet has been shot
 			if(message.is("rBullet"))
 				bullets.add(createBullet(message.getArg(0), message.getArg(1), message.doubleArg(2), message.doubleArg(3), message.doubleArg(4)));
+		
+			// a tank's health has been updated
+			if(message.is("health"))
+				updateTankHealth(message.getArg(0), message.doubleArg(1));
 		}
 	}
 	
@@ -221,7 +241,20 @@ public class BattleScene extends Scene implements NetworkListener {
 		tank.setY(point.y);
 		tank.savePositionToServer();
 	}
+	
+	private void updateTankHealth(String id, double newHealth) {
+		if(id.equals(playerID))
+			return;
+		Tank tank = players.get(id);
+		if(tank != null) {
+			players.get(id).setHealth(newHealth);
+		}
+	}
 
+	public void onTankKilled(Tank tank) {
+		
+	}
+	
 	private Tank createTank(String playerID, String name, boolean serverControlled) {
 		Tank tank = new GenericTank(playerID, name, serverControlled, this);
 		tank.setX(500);
@@ -244,6 +277,15 @@ public class BattleScene extends Scene implements NetworkListener {
 	
 	public void removeFromRenderQueue(Renderable item) {
 		itemsToRender.remove(item);
+	}
+	
+	public Tank getCollidedTank(double x, double y) {
+		for(Tank tank : players.values()) {
+			ColliderRect rect = tank.getColliderRect(5);
+			if(rect != null && rect.isInside(x, y))
+				return tank;
+		}
+		return null;
 	}
 	
 	@Override

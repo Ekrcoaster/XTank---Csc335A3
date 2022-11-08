@@ -25,17 +25,21 @@ public class JoinScene extends Scene implements NetworkListener {
 	public String myPlayerID;
 	public String myPlayerName;
 	
-	public JoinScene(boolean client, boolean server, String playerName) {
+	public String mapName;
+	
+	public JoinScene(boolean client, boolean server, String playerName, String mapName) {
 		this.client = client;
 		this.server = server;
 
 		this.myPlayerID = null;
 		this.myPlayerName = playerName;
+		
+		this.mapName = mapName;
 	}
 
 	@Override
 	public void init() {
-		ui = new JoinSceneUI(client, server, this);
+		ui = new JoinSceneUI(client, server, this, mapName);
 		playerIDs = new ArrayList<String>();
 		playerNames = new ArrayList<String>();
 		WindowHolder.setPanel(ui);
@@ -86,7 +90,7 @@ public class JoinScene extends Scene implements NetworkListener {
 			playerNames.remove(index);
 		}
 		
-		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames, server, "empty");
+		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames, server, mapName);
 		SceneManager.setScene(scene);
 	}
 

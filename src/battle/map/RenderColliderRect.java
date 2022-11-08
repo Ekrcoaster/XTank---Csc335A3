@@ -19,8 +19,14 @@ public class RenderColliderRect extends ColliderRect implements Renderable {
 
 	public void render(Graphics g) {
 		g.setColor(color);
+		g.drawRect((int)Math.round(x1), (int)Math.round(y1), (int)Math.round(x2-x1), (int)Math.round(y2-y1));
+
+		g.setColor(dimColor(color, 0.6));
 		int buffer = 5;
 		g.drawRect((int)Math.round(x1)+5, (int)Math.round(y1)+5, (int)Math.round(x2-x1)-buffer*2, (int)Math.round(y2-y1)-buffer*2);
-		g.drawRect((int)Math.round(x1), (int)Math.round(y1), (int)Math.round(x2-x1), (int)Math.round(y2-y1));
+	}
+	
+	Color dimColor(Color color, double percentage) {
+		return new Color((int)(color.getRed()*percentage), (int)(color.getGreen() * percentage), (int)(color.getBlue() * percentage));
 	}
 }

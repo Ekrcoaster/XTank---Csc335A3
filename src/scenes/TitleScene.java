@@ -24,7 +24,7 @@ public class TitleScene extends Scene {
 	@Override
 	public void exit() {}
 	
-	public void beginGame(boolean client, boolean server, String address, int port, String name) {
+	public void beginGame(boolean client, boolean server, String address, int port, String name, String mapName) {
 		// if the player wants a client, create the client
 		if(client) {
 			try {
@@ -35,7 +35,7 @@ public class TitleScene extends Scene {
 				Client c = new Client(server, address, port, name.replace(" ", "_"));
 				
 				// finally, swap the scenes to the join scene
-				SceneManager.setScene(new JoinScene(client, server, name));
+				SceneManager.setScene(new JoinScene(client, server, name, mapName));
 				
 			} catch (Exception e) {
 				ui.pushError(e);
@@ -46,7 +46,7 @@ public class TitleScene extends Scene {
 		} else if(server) {
 			try {
 				new Server(port);
-				SceneManager.setScene(new JoinScene(client, server, null));
+				SceneManager.setScene(new JoinScene(client, server, null, mapName));
 				
 			} catch (Exception e) {
 				ui.pushError(e);

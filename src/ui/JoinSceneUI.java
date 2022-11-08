@@ -31,13 +31,13 @@ public class JoinSceneUI extends JPanel {
 	
 	boolean server;
 	
-	public JoinSceneUI(boolean client, boolean server, JoinScene scene) {
+	public JoinSceneUI(boolean client, boolean server, JoinScene scene, String map) {
 		this.scene = scene;
 		this.server = server;
 		setLayout(null);
 
-        JLabel playerLabel = new JLabel("Connected Players:");
-        playerLabel.setBounds(300, 80, 150, 20);
+        JLabel playerLabel = new JLabel("Connected Players: (playing map \"" + map + "\")");
+        playerLabel.setBounds(300, 80, 350, 20);
         add(playerLabel);
         
 		playerListModel = new DefaultListModel<String>();

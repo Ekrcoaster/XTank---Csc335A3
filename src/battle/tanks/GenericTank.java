@@ -13,6 +13,7 @@ public class GenericTank extends Tank {
 	public GenericTank(String id, String name, boolean isServerControlled, BattleScene scene) {
 		super(id, name, isServerControlled, scene);
 		this.health = 10;
+		this.maxHealth = 10;
 		this.moveSpeed = 5;
 		this.rotateSpeed = 3;
 		this.size = 15;

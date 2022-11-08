@@ -14,6 +14,7 @@ import java.util.HashSet;
 import _main._Settings;
 import battle.bullets.Bullet;
 import battle.map.ColliderHitPoint;
+import battle.map.ColliderRect;
 import network.Client;
 import network.NetworkListener;
 import scenes.BattleScene;
@@ -27,8 +28,9 @@ public abstract class Tank implements Renderable {
 	protected double x, y;
 	protected double direction; //degrees
 	protected double size;
+	protected boolean isDead;
 
-	protected int health;
+	protected double health, maxHealth;
 	protected double moveSpeed, rotateSpeed;
 	protected double bulletSpeedCooldown; // seconds
 
@@ -43,9 +45,11 @@ public abstract class Tank implements Renderable {
 		
 		this.x = 0;
 		this.y = 0;
+		this.isDead = false;
 		setDirection(0);
 		this.size = 0;
 		this.health = 0;
+		this.maxHealth = 0;
 		this.moveSpeed = 0;
 		this.rotateSpeed = 0;
 		this.bulletSpeedCooldown = 0;
@@ -82,10 +86,14 @@ public abstract class Tank implements Renderable {
 	public abstract Bullet shoot(IntPoint origin, double direction);
 	
 	/*
-	 * This will damage the tank and kill it <- TODO
+	 * This will damage the tank and kill it
 	 */
-	public void damage(int health) {
-		this.health -= health;
+	public void damage(double amount) {
+		setHealth(health - amount);
+	}
+	
+	public void kill() {
+		isDead = true;
 	}
 	
 	/*
@@ -93,6 +101,9 @@ public abstract class Tank implements Renderable {
 	 */
 	public void update() {
 		if(isServerControlled)
+			return;
+		
+		if(isDead)
 			return;
 		
 		if(bulletActiveCooldown > 0)
@@ -103,6 +114,9 @@ public abstract class Tank implements Renderable {
 	 * This will only get called if this tank is the player, it updates controls
 	 */
 	public void updateControls(HashSet<Integer> keysDown) {
+		if(isDead)
+			return;
+		
 		if(keysDown.contains(KeyEvent.VK_LEFT) || keysDown.contains(KeyEvent.VK_KP_LEFT)) {
 			turn(-rotateSpeed);
 			saveDirectionToServer();
@@ -148,8 +162,10 @@ public abstract class Tank implements Renderable {
 	// -------------------
 	
 	public void render(Graphics g) {
+		Color tankColor = getColor();
+		if(isDead) tankColor = new Color(40, 40, 40);
 		double gunLength = 1-(bulletActiveCooldown / (double)bulletSpeedCooldown)*0.4+0.3;
-		g.setColor(getColor());
+		g.setColor(tankColor);
 		drawRotatedPolygon(new IntPoint[] {
 				rotatePoint(-size * 0.3, -size - size * gunLength).offset(x, y),
 				rotatePoint(size * 0.3, -size - size * gunLength).offset(x, y),
@@ -163,18 +179,31 @@ public abstract class Tank implements Renderable {
 				rotatePoint(-size, size).offset(x, y)
 		}, g);
 		
-		renderHoverUI(g, rotatePoint(0, size*1.5).offset(x, y));
+		renderHoverUI(g, rotatePoint(0, size*1.5).offset(x, y), tankColor);
 	}
 	
-	protected void renderHoverUI(Graphics g, IntPoint origin) {
+	protected void renderHoverUI(Graphics g, IntPoint origin, Color color) {
 		FontMetrics metrics = g.getFontMetrics();
 		int width = metrics.stringWidth(name);
 		int height = 14;
+		
+		// draw the background to the label
 		g.setColor(new Color(10, 10, 10));
 		g.fillRect((int)(origin.x - width*.5), (int)(origin.y - height * 0.7), width, height);
 		
-		g.setColor(getColor());
+		// draw the label
+		g.setColor(color);
 		g.drawString(name, (int)(origin.x - width*.5), origin.y);
+		
+		// render the healthbar ONLY if the tank is damaged
+		if(health < maxHealth && !isDead) {
+			int healthBarWidth = 30;
+			g.setColor(Color.red);
+			g.fillRect((int)(origin.x - healthBarWidth*.5), (int)(origin.y - height * 0.7)+15, healthBarWidth, 2);
+
+			g.setColor(Color.green);
+			g.fillRect((int)(origin.x - healthBarWidth*.5), (int)(origin.y - height * 0.7)+15, (int)(healthBarWidth * (health / maxHealth)), 2);
+		}
 	}
 
 	/*
@@ -203,6 +232,12 @@ public abstract class Tank implements Renderable {
 	//  getters / setters
 	// -------------------
 
+	public ColliderRect getColliderRect(int padding) {
+		if(isDead)
+			return null;
+		return new ColliderRect(x - size - padding, y - size - padding, x + size + padding, y + size + padding);
+	}
+	
 	protected Color getColor() {
 		if(isServerControlled)
 			return Color.blue;
@@ -232,6 +267,10 @@ public abstract class Tank implements Renderable {
 	public double getSize() {
 		return size;
 	}
+	
+	public String getID() {
+		return id;
+	}
 
 	public void setDirection(double direction) {
 		this.direction = direction;
@@ -239,12 +278,14 @@ public abstract class Tank implements Renderable {
 		cachedCos = Math.cos(Math.toRadians(direction));
 	}
 	
-	public int getHealth() {
+	public double getHealth() {
 		return health;
 	}
 
-	public void setHealth(int health) {
+	public void setHealth(double health) {
 		this.health = health;
+		if(health <= 0)
+			kill();
 	}
 	
 	@Override

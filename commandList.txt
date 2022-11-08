@@ -25,7 +25,8 @@ rDir <playerId> <x> <y>
 rBullet <playerId> <bulletType> <x> <y> <dir>
 	Message from the server: create a bullet here and shoot it
 
-
+health <playerId> <newHealth>
+	Message from the server: this tank's new health is x
 
 
 
