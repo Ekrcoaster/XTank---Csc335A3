@@ -84,9 +84,6 @@ public class BattleScene extends Scene implements NetworkListener {
 			Client.client.addListener(this);
 		}
 		
-		if(playerID != null)
-			placeTankAtRandomPosition(players.get(playerID));
-		
 		// add all tanks to render queue
 		for(Tank tank : players.values()) {
 			addToRenderQueue(tank);
@@ -106,6 +103,10 @@ public class BattleScene extends Scene implements NetworkListener {
 			long lastTime = System.nanoTime();
 			double ratio = 1000000000.0 / (double)Boot.BATTLE_FPS;
 			double delta = 0;
+			
+			// place the player at a random position
+			if(playerID != null)
+				placeTankAtRandomPosition(players.get(playerID));
 
 			// run as fast as humanly possible
 			while(!exit) {
@@ -246,8 +247,6 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 	
 	private void updateTankHealth(String id, double newHealth) {
-		if(id.equals(playerID))
-			return;
 		Tank tank = players.get(id);
 		if(tank != null) {
 			players.get(id).setHealth(newHealth);

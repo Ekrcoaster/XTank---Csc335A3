@@ -12,17 +12,13 @@ public class MagicBullet extends Bullet {
 	Tank target;
 	int bounceCooldown;
 	int pullinSpeed;
-	double randomTwirlAmount;
-	double naturalLean;
 
 	public MagicBullet(BattleScene scene, String ownerID, double x, double y, double direction) {
 		super(scene, ownerID, x, y, direction);
 		this.damage = 1;
-		this.speed = 5 + Math.random()*4;
-		this.pullinSpeed = 700 + (int)(Math.random()*200);
-		this.randomTwirlAmount = Math.random() * 10;
-		this.naturalLean = 1 - Math.random();
+		this.speed = 5;
 		this.collisionRadius = 5;
+		this.pullinSpeed = 800;
 		
 		bounceCooldown = 0;
 		recalculateTarget();
@@ -80,7 +76,7 @@ public class MagicBullet extends Bullet {
 			else
 				a += 360;
 		}
-		return a - b + (Math.random() * randomTwirlAmount) + naturalLean*5;
+		return a - b;
 	}
 	
 	double calculateDistance(Tank tank) {

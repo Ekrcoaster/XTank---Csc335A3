@@ -1,6 +1,7 @@
 package battle.tanks;
 
 import java.awt.Color;
+import java.awt.Graphics;
 
 import battle.bullets.BombBullet;
 import battle.bullets.Bullet;
@@ -21,7 +22,7 @@ public class BombTank extends Tank {
 	@Override public void update() {
 		super.update();
 
-		this.moveSpeed = 1.5 + ((bulletActiveCooldown / bulletSpeedCooldown))*4;
+		this.moveSpeed = 1.5 + (bulletActiveCooldown / bulletSpeedCooldown)*4;
 	}
 
 	@Override
@@ -32,5 +33,15 @@ public class BombTank extends Tank {
 	@Override
 	public String getType() {
 		return "bomb";
+	}
+
+	@Override
+	protected void drawTankBody(Graphics g, Color color) {
+		g.setColor(dimColor(color, 0.5));
+		int offset = (int)(15 * (bulletActiveCooldown / bulletSpeedCooldown))+3;
+		g.drawOval((int)(x-size)+offset, (int)(y-size)+offset, (int)size*2-offset*2, (int)size*2-offset*2);
+		
+		g.setColor(color);
+		g.drawOval((int)(x-size), (int)(y-size), (int)size*2, (int)size*2);
 	}
 }

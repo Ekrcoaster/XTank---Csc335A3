@@ -27,10 +27,10 @@ public class SceneManager {
 		ArrayList<String> tempPlayerTypes = new ArrayList<String>();
 		tempPlayerIDS.add("000");
 		tempPlayerNames.add("Bob");
-		tempPlayerTypes.add("generic");
+		tempPlayerTypes.add("magic");
 		tempPlayerIDS.add("afcfs");
 		tempPlayerNames.add("Taylor Swift");
-		tempPlayerTypes.add("sturdy");
+		tempPlayerTypes.add("bomb");
 		tempPlayerIDS.add("sdsdsd");
 		tempPlayerNames.add("Adele");
 		tempPlayerTypes.add("scout");

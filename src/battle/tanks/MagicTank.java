@@ -1,6 +1,7 @@
 package battle.tanks;
 
 import java.awt.Color;
+import java.awt.Graphics;
 
 import battle.bullets.Bullet;
 import battle.bullets.MagicBullet;
@@ -25,5 +26,21 @@ public class MagicTank extends Tank {
 	@Override
 	public String getType() {
 		return "magic";
+	}
+	
+	@Override
+	protected void drawTankBody(Graphics g, Color color) {
+		g.setColor(color);
+		drawRotatedPoly(new double[][] {
+			{-size, -size},
+			{size, -size},
+			{0, size},
+		}, direction, g);
+
+		drawRotatedPoly(new double[][] {
+			{-size, size},
+			{size, size},
+			{0, 0},
+		}, direction, g);
 	}
 }
