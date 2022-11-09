@@ -74,7 +74,7 @@ public class BattleScene extends Scene implements NetworkListener {
 		exit = false;
 		
 		// create the scenes board UI
-		ui = new BattleBoardUI();
+		ui = new BattleBoardUI(this);
 		WindowHolder.setPanel(ui);
 		
 		// if we are the server (aka we are spectating)
@@ -90,7 +90,7 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 		
 		for(Renderable item : map.getRenderables()) {
-			addToRenderQueue(item);
+			addToStartRenderQueue(item);
 		}
 		
 		startGameLoop();
@@ -294,6 +294,10 @@ public class BattleScene extends Scene implements NetworkListener {
 	
 	public void addToRenderQueue(Renderable item) {
 		itemsToRender.add(item);
+	}
+
+	public void addToStartRenderQueue(Renderable item) {
+		itemsToRender.add(0, item);
 	}
 	
 	public void removeFromRenderQueue(Renderable item) {

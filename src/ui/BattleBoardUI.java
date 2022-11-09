@@ -20,7 +20,9 @@ import java.util.HashSet;
 import javax.swing.JPanel;
 
 import battle.tanks.Tank;
+import scenes.BattleScene;
 import battle.bullets.*;
+import battle.map.BattleMap;
 import battle.map.RenderColliderRect;
 
 public class BattleBoardUI extends JPanel implements KeyListener{
@@ -30,9 +32,12 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 	HashSet<Integer> keysDown;
 	ArrayList<Renderable> renderQueue;
 	
-	public BattleBoardUI() {
+	BattleScene scene;
+	
+	public BattleBoardUI(BattleScene scene) {
 		this.renderQueue = new ArrayList<Renderable>();
 		this.keysDown = new HashSet<Integer>();
+		this.scene = scene;
 		setLayout(new BorderLayout(0, 0));
 		
 		setFocusable(true);
@@ -73,6 +78,16 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		keysDown.add(e.getKeyCode());
+		if(e.getKeyChar() == 'e') {
+			for(Renderable item : scene.map.getRenderables()) {
+				scene.removeFromRenderQueue(item);
+			}
+			scene.map = new BattleMap(scene.map.getMapName(), scene.map.getMapWidth(), scene.map.getMapHeight());
+
+			for(Renderable item : scene.map.getRenderables()) {
+				scene.addToStartRenderQueue(item);
+			}
+		}
 	}
 
 	@Override

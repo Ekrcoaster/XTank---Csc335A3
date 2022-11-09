@@ -18,8 +18,13 @@ public class BattleMap {
 	HashSet<ColliderRect> colliders;
 	ArrayList<Renderable> renderableColliders;
 	
+	String mapName;
+	int mapWidth, mapHeight;
+	
 	public BattleMap(String mapName, int mapWidth, int mapHeight) {
-		System.out.println(mapWidth + " " + mapHeight);
+		this.mapName = mapName;
+		this.mapWidth = mapWidth;
+		this.mapHeight = mapHeight;
 		colliders = new HashSet<ColliderRect>();
 		renderableColliders = new ArrayList<Renderable>();
 		
@@ -51,7 +56,7 @@ public class BattleMap {
 			String line = scanner.nextLine();
 			
 			// check if it is not a comment
-			if(!line.startsWith("#")) {
+			if(!line.startsWith("#") && !line.isEmpty()) {
 				// check if it has enough lines
 				String[] split = line.replace(" |", "").split(" ");
 				if(split.length != 8) {
@@ -86,7 +91,19 @@ public class BattleMap {
 		colliders.add(rect);
 		renderableColliders.add(rect);
 	}
-	
+
+	public String getMapName() {
+		return mapName;
+	}
+
+	public int getMapWidth() {
+		return mapWidth;
+	}
+
+	public int getMapHeight() {
+		return mapHeight;
+	}
+
 	public HashSet<ColliderRect> getColliders() {
 		return colliders;
 	}

@@ -132,7 +132,7 @@ public class TitleSceneUI extends JPanel {
 			names[i] = files[i].getName().replace(".txt", "");
 		}
 		
-		mapChooser = new DropdownField("Choose your Map:", "map1", names, 100, 70, 20);
+		mapChooser = new DropdownField("Choose your Map:", Boot.defaultMapType, names, 100, 70, 20);
 		playSettingsPanel.add(mapChooser);
 		
 		return playSettingsPanel;
