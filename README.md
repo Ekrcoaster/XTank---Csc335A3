@@ -1,3 +1,15 @@
+# Nov 8th
+Multiple different type of tanks and bullets have been added, health and stuff for multiplayer has been finished and works properly. You can choose a map on the title screen, and if you are a player, you can choose your tank on the join screen using some cool fancy ui stuff.
+
+Todo still: (not really in order)
+- Maybe some sort of like player list to show who is alive
+- death screen + restart game?
+- gameplay overlays (with info to the player)
+- refactor the code
+- Make sure everything meets the spec requirement
+
+_-Ethan_
+
 # Nov 7th
 I've added the mutliplayer functionality completely! You can now run **boot.java** and you'll be prompted with the game creation screen, then a place to join in, then you can being the game!
 
