@@ -262,21 +262,11 @@ public class BattleScene extends Scene implements NetworkListener {
 		Tank tank;
 		
 		switch(type) {
-			case "bomb":
-				tank = new BombTank(playerID, name, serverControlled, this);
-				break;
-			case "magic":
-				tank = new MagicTank(playerID, name, serverControlled, this);
-				break;
-			case "scout":
-				tank = new ScoutTank(playerID, name, serverControlled, this);
-				break;
-			case "sturdy":
-				tank = new SturdyTank(playerID, name, serverControlled, this);
-				break;
-			default:
-				tank = new GenericTank(playerID, name, serverControlled, this);
-				break;
+			case "bomb": tank = new BombTank(playerID, name, serverControlled, this); break;
+			case "magic": tank = new MagicTank(playerID, name, serverControlled, this); break;
+			case "scout": tank = new ScoutTank(playerID, name, serverControlled, this); break;
+			case "sturdy": tank = new SturdyTank(playerID, name, serverControlled, this); break;
+			default: tank = new GenericTank(playerID, name, serverControlled, this); break;
 		}
 		
 		tank.setX(500);
@@ -285,13 +275,17 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 	
 	private Bullet createBullet(String playerID, String bulletType, double x, double y, double direction) {
+		Bullet bullet;
 		switch(bulletType) {
-			case "bomb": return new BombBullet(this, playerID, x, y, direction);
-			case "magic": return new MagicBullet(this, playerID, x, y, direction);
-			case "scout": return new ScoutBullet(this, playerID, x, y, direction);
-			case "sturdy": return new SturdyBullet(this, playerID, x, y, direction);
-			default: return new GenericBullet(this, playerID, x, y, direction);
+			case "bomb": bullet = new BombBullet(this, playerID, x, y, direction); break;
+			case "magic": bullet = new MagicBullet(this, playerID, x, y, direction); break;
+			case "scout": bullet = new ScoutBullet(this, playerID, x, y, direction); break;
+			case "sturdy": bullet = new SturdyBullet(this, playerID, x, y, direction); break;
+			default: bullet = new GenericBullet(this, playerID, x, y, direction); break;
 		}
+		
+		addToRenderQueue(bullet);
+		return bullet;
 	}
 	
 	public void destroyBullet(Bullet bullet) {

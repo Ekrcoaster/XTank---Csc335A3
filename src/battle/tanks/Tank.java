@@ -142,7 +142,6 @@ public abstract class Tank implements Renderable {
 		if(keysDown.contains(KeyEvent.VK_SPACE) && bulletActiveCooldown <= 0) {
 			Bullet shot = shoot(rotatePoint(0, -size*2, direction).offset(x, y), direction);
 			scene.bullets.add(shot);
-			scene.addToRenderQueue(shot);
 			bulletActiveCooldown = bulletSpeedCooldown;
 			sendMessage("sBullet " + shot.getType() + " " + x + " " + y + " " + direction);
 		}

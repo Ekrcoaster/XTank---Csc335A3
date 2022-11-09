@@ -128,13 +128,13 @@ public class JoinSceneUI extends JPanel {
 
 		int xOffset = (int)(width * 0.115); 
 		JLabel label = new JLabel("Choose your Tank:");
-		label.setBounds(xOffset, 40, width, 32);
+		label.setBounds(xOffset, 10, width, 32);
 		tankSelectorPanel.add(label);
 		
 		
 		
 		for(int i = 0; i < tankNames.length; i++) {
-			TankTypePreviewUI ui = new TankTypePreviewUI(tankNames[i], tankDescriptions[i], tankInstances[i], xOffset, i * 120 + 80, (int)(width * 0.75), 100);
+			TankTypePreviewUI ui = new TankTypePreviewUI(tankNames[i], tankDescriptions[i], tankInstances[i], xOffset, i * 100 + 40, (int)(width * 0.75), 90);
 			types.add(ui);
 			final int index = i;
 			ui.addMouseListener(new MouseListener() {
