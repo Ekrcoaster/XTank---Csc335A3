@@ -14,6 +14,6 @@ public class ColliderHitPoint {
 	}
 	@Override
 	public String toString() {
-		return "(" + this.x + ", " + y + ")";
+		return "(" + this.x + ", " + y + "  hit=" + hit + ")";
 	}
 }

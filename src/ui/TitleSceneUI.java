@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import _main._Settings;
+import _main.Boot;
 import scenes.TitleScene;
 
 public class TitleSceneUI extends JPanel {
@@ -50,7 +50,7 @@ public class TitleSceneUI extends JPanel {
 		// add the play button
 		int playWidth = 200;
 		playButton = new JButton("Play");
-		playButton.setBounds((int)(_Settings.windowSize.getWidth() * 0.5 - playWidth * 0.5), 150 + verticalOffset, playWidth, 50);
+		playButton.setBounds((int)(Boot.windowSize.getWidth() * 0.5 - playWidth * 0.5), 150 + verticalOffset, playWidth, 50);
 		// when pressed, tell the scene to begin the servers
 		playButton.addActionListener(l -> {
 			title.beginGame(selectedPlayMode == 0 || selectedPlayMode == 2, selectedPlayMode == 1 || selectedPlayMode == 2, ipAddress.getValue(), port.getValue(), name.getValue(), mapChooser.getValue());
@@ -60,7 +60,7 @@ public class TitleSceneUI extends JPanel {
 		// add in the error label at the top, just incase its needed
 		error = new JLabel("");
 		error.setForeground(Color.red);
-		error.setBounds(20, 0, (int)_Settings.windowSize.getWidth(), 50);
+		error.setBounds(20, 0, (int)Boot.windowSize.getWidth(), 50);
 		add(error);
 		
 		setSelected(-1);
@@ -71,7 +71,7 @@ public class TitleSceneUI extends JPanel {
 	 */
 	public JPanel createButtonsPanel(int offset) {
 		buttonsPanel = new JPanel();
-		buttonsPanel.setBounds(0, offset, (int)_Settings.windowSize.getWidth(), 36);
+		buttonsPanel.setBounds(0, offset, (int)Boot.windowSize.getWidth(), 36);
 		
 		// define the buttons
 		String[] buttonOptions = {
@@ -98,20 +98,20 @@ public class TitleSceneUI extends JPanel {
 	 */
 	public JPanel createLaunchSettingsPanel(int offset) {
 		launchSettingsPanel = new JPanel();
-		launchSettingsPanel.setBounds(100, offset + 40, (int)_Settings.windowSize.getWidth()-200, 40);
+		launchSettingsPanel.setBounds(100, offset + 40, (int)Boot.windowSize.getWidth()-200, 40);
 
 		// ip address field
-		ipAddress = new StringField("IP Address:", _Settings.getIPAddress(), 100, 70, 20);
+		ipAddress = new StringField("IP Address:", Boot.getIPAddress(), 100, 70, 20);
 		launchSettingsPanel.add(ipAddress);
 		ipAddress.addChangeListener(createUIUpdateDocumentListener());
 		
 		// port field
-		port = new IntegerField("Port:", _Settings.defaultPort, 0, 99999, 100, 70, 20);
+		port = new IntegerField("Port:", Boot.defaultPort, 0, 99999, 100, 70, 20);
 		launchSettingsPanel.add(port);
 		port.addChangeListener(l -> update());
 
 		// name field
-		name = new StringField("Your Name:", _Settings.getName(), 100, 70, 20);
+		name = new StringField("Your Name:", Boot.getName(), 100, 70, 20);
 		launchSettingsPanel.add(name);
 		name.addChangeListener(createUIUpdateDocumentListener());
 		
@@ -120,7 +120,7 @@ public class TitleSceneUI extends JPanel {
 	
 	public JPanel createMapSettingsPanel(int offset) {
 		playSettingsPanel = new JPanel();
-		playSettingsPanel.setBounds(100, offset+75, (int)_Settings.windowSize.getWidth()-200, 40);
+		playSettingsPanel.setBounds(100, offset+75, (int)Boot.windowSize.getWidth()-200, 40);
 		
 		// get all of the maps from the directory
 		File directory = new File("./maps");

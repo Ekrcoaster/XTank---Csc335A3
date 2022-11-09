@@ -7,6 +7,7 @@ package scenes;
 
 import java.util.ArrayList;
 
+import _main.Boot;
 import network.Client;
 import network.Message;
 import network.NetworkListener;
@@ -21,9 +22,11 @@ public class JoinScene extends Scene implements NetworkListener {
 	
 	public ArrayList<String> playerIDs;
 	public ArrayList<String> playerNames;
+	public ArrayList<String> playerTankTypes;
 	
 	public String myPlayerID;
 	public String myPlayerName;
+	public String myPlayerTank;
 	
 	public String mapName;
 	
@@ -33,6 +36,7 @@ public class JoinScene extends Scene implements NetworkListener {
 
 		this.myPlayerID = null;
 		this.myPlayerName = playerName;
+		this.myPlayerTank = Boot.defaultTankType;
 		
 		this.mapName = mapName;
 	}
@@ -42,6 +46,7 @@ public class JoinScene extends Scene implements NetworkListener {
 		ui = new JoinSceneUI(client, server, this, mapName);
 		playerIDs = new ArrayList<String>();
 		playerNames = new ArrayList<String>();
+		playerTankTypes = new ArrayList<String>();
 		WindowHolder.setPanel(ui);
 		
 		// if we are a client
@@ -72,13 +77,14 @@ public class JoinScene extends Scene implements NetworkListener {
 			if(playerIDs.get(i) == null) {
 				playerIDs.remove(i);
 				playerNames.remove(i);
+				playerTankTypes.remove(i);
 				i--;
 			}
 		}
 		
 		enterBattleScene();
 		
-		Server.server.sendMessageToAllBut("start battle", myPlayerID);
+		Server.server.sendMessageToAllBut("start battle ", myPlayerID);
 	}
 	
 	public void enterBattleScene() {
@@ -88,9 +94,10 @@ public class JoinScene extends Scene implements NetworkListener {
 			int index = playerIDs.indexOf(myPlayerID);
 			playerIDs.remove(index);
 			playerNames.remove(index);
+			playerTankTypes.remove(index);
 		}
 		
-		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, playerIDs, playerNames, server, mapName);
+		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, myPlayerTank, playerIDs, playerNames, playerTankTypes, server, mapName);
 		SceneManager.setScene(scene);
 	}
 
@@ -106,11 +113,14 @@ public class JoinScene extends Scene implements NetworkListener {
 		
 		// odd entrees are IDs, even entrees are names
 		for(int i = 0; i < pieces.length; i++) {
-			if(i % 2 == 0)
+			if(i % 3 == 0)
 				playerIDs.add(pieces[i]);
-			else {
+			else if(i % 3 == 1) {
 				playerNames.add(pieces[i]);
 				ui.addPlayerName(pieces[i]);
+			} else {
+				playerTankTypes.add(pieces[i]);
+				ui.updatePlayerName(playerTankTypes.size() - 1, pieces[i]);
 			}
 		}
 	}
@@ -121,6 +131,7 @@ public class JoinScene extends Scene implements NetworkListener {
 		if(message.is("join") && !client) {
 			playerIDs.add(message.fromID);
 			playerNames.add(message.getArg(0));
+			playerTankTypes.add(Boot.defaultTankType);
 			ui.addPlayerName(message.getArg(0));
 		}
 		
@@ -128,6 +139,7 @@ public class JoinScene extends Scene implements NetworkListener {
 		if(message.is("joined")) {
 			playerIDs.add(message.getArg(0));
 			playerNames.add(message.getArg(1));
+			playerTankTypes.add(Boot.defaultTankType);
 			ui.addPlayerName(message.getArg(1));
 		}
 		
@@ -148,6 +160,16 @@ public class JoinScene extends Scene implements NetworkListener {
 			myPlayerID = message.getArg(0);
 			// make sure this value isn't null anymore
 			Client.client.id = myPlayerID;
+		}
+		
+		// player changed tank type
+		if(message.is("rTankType")) {
+			System.out.println(message);
+			for(String s : playerIDs)
+				System.out.println("  " + s);
+			int index = playerIDs.indexOf(message.getArg(0));
+			playerTankTypes.set(index, message.getArg(1));
+			ui.updatePlayerName(index, message.getArg(1));
 		}
 	}
 

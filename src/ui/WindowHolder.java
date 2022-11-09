@@ -11,7 +11,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import _main._Settings;
+import _main.Boot;
 
 public class WindowHolder {
 	public static JFrame frame;
@@ -22,8 +22,8 @@ public class WindowHolder {
 			frame = new JFrame();
 			
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize((int)_Settings.windowSize.getWidth(), (int)_Settings.windowSize.getHeight());
-			frame.setPreferredSize(_Settings.windowSize);
+			frame.setSize((int)Boot.windowSize.getWidth(), (int)Boot.windowSize.getHeight());
+			frame.setPreferredSize(Boot.windowSize);
 			frame.setVisible(true);
 			frame.setResizable(false);
 	        

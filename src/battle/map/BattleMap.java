@@ -61,6 +61,8 @@ public class BattleMap {
 				}
 			}
 		}
+		
+		scanner.close();
 	}
 	
 	private void readMapInterpretLine(String[] pieces) {

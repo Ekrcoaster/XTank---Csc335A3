@@ -26,10 +26,12 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	
 	String id;
 	String name;
+	String tankType;
 	
 	public ServerClientConnection(String id, String name) {
 		this.id = id;
 		this.name = name;
+		this.tankType = Boot.defaultTankType;
 	}
 	
 	/*
@@ -110,6 +112,11 @@ public class ServerClientConnection implements Runnable, MessageNode {
 		
 		if(message.is("myID"))
 			sendMessage("retMyID " + id);
+		
+		if(message.is("sTankType")) {
+			tankType = message.getArg(0);
+			Server.server.sendMessageToAllBut("rTankType " + id + " " + message.joinedArgs(), id);
+		}
 	}
 	
 	@Override
@@ -119,6 +126,10 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	
 	public String getName() {
 		return name;
+	}
+
+	public String getTankType() {
+		return tankType;
 	}
 	
 	public void setSocket(Socket socket) {

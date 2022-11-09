@@ -11,7 +11,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 
-import _main._Settings;
+import _main.Boot;
 import battle.bullets.Bullet;
 import battle.map.ColliderHitPoint;
 import battle.map.ColliderRect;
@@ -35,7 +35,7 @@ public abstract class Tank implements Renderable {
 	protected double bulletSpeedCooldown; // seconds
 
 	double cachedSin, cachedCos;
-	private double bulletActiveCooldown;
+	protected double bulletActiveCooldown;
 	
 	public Tank(String id, String name, boolean isServerControlled, BattleScene scene) {
 		this.isServerControlled = isServerControlled;
@@ -100,14 +100,17 @@ public abstract class Tank implements Renderable {
 	 * The _main update, update all of the bullets and cooldowns
 	 */
 	public void update() {
-		if(isServerControlled)
-			return;
-		
 		if(isDead)
 			return;
 		
+		if(health > maxHealth)
+			maxHealth = health;
+		
+		if(isServerControlled)
+			return;
+		
 		if(bulletActiveCooldown > 0)
-			bulletActiveCooldown -= 1.0 / _Settings.BATTLE_FPS;
+			bulletActiveCooldown -= 1.0 / Boot.BATTLE_FPS;
 	}
 	
 	/*
@@ -137,7 +140,7 @@ public abstract class Tank implements Renderable {
 			savePositionToServer();
 		}
 		if(keysDown.contains(KeyEvent.VK_SPACE) && bulletActiveCooldown <= 0) {
-			Bullet shot = shoot(rotatePoint(0, -size*2).offset(x, y), direction);
+			Bullet shot = shoot(rotatePoint(0, -size*2, direction).offset(x, y), direction);
 			scene.bullets.add(shot);
 			scene.addToRenderQueue(shot);
 			bulletActiveCooldown = bulletSpeedCooldown;
@@ -165,21 +168,33 @@ public abstract class Tank implements Renderable {
 		Color tankColor = getColor();
 		if(isDead) tankColor = new Color(40, 40, 40);
 		double gunLength = 1-(bulletActiveCooldown / (double)bulletSpeedCooldown)*0.4+0.3;
-		g.setColor(tankColor);
-		drawRotatedPolygon(new IntPoint[] {
-				rotatePoint(-size * 0.3, -size - size * gunLength).offset(x, y),
-				rotatePoint(size * 0.3, -size - size * gunLength).offset(x, y),
-				rotatePoint(size * 0.3, size - size).offset(x, y),
-				rotatePoint(-size * 0.3, size - size).offset(x, y)
-		}, g);
-		drawRotatedPolygon(new IntPoint[] {
-				rotatePoint(-size, -size).offset(x, y),
-				rotatePoint(size, -size).offset(x, y),
-				rotatePoint(size, size).offset(x, y),
-				rotatePoint(-size, size).offset(x, y)
-		}, g);
 		
-		renderHoverUI(g, rotatePoint(0, size*1.5).offset(x, y), tankColor);
+		drawTankBody(g, tankColor);
+		drawTankGun(g, tankColor, gunLength);
+
+		renderHoverUI(g, rotatePoint(0, size*1.5, direction).offset(x, y), tankColor);
+	}
+	
+	protected void drawTankBody(Graphics g, Color color) {
+		g.setColor(color);
+		
+		drawRotatedPoly(new double[][] {
+			{-size, -size},
+			{size, -size},
+			{size, size},
+			{-size, size}
+		}, direction, g);
+	}
+	
+	protected void drawTankGun(Graphics g, Color color, double gunLength) {
+		g.setColor(color);
+		
+		drawRotatedPoly(new double[][] {
+			{-size * 0.3, -size - size * gunLength},
+			{size * 0.3, -size - size * gunLength},
+			{size * 0.3, size - size},
+			{-size * 0.3, size - size}
+		}, direction, g);
 	}
 	
 	protected void renderHoverUI(Graphics g, IntPoint origin, Color color) {
@@ -206,19 +221,33 @@ public abstract class Tank implements Renderable {
 		}
 	}
 
+	protected void drawRotatedPoly(double[][] points, double degree, Graphics g) {
+		IntPoint[] intPoints = new IntPoint[points.length];
+		for(int i = 0; i < intPoints.length; i++) {
+			intPoints[i] = rotatePoint(points[i][0], points[i][1], degree).offset(x, y);
+		}
+		
+		drawIntPointPolygon(intPoints, g);
+	}
 	/*
 	 * Given a x/y, rotate it by the current direction
 	 */
-	public IntPoint rotatePoint(double x, double y) {
+	protected IntPoint rotatePoint(double x, double y, double degree) {
+		// tiny optimization, if we are using the direction of the tank, just use the sin/cos cached
+		double sin = cachedSin; 
+		if(degree != direction) sin = Math.sin(Math.toRadians(degree));
+		double cos = cachedCos; 
+		if(degree != direction) cos = Math.cos(Math.toRadians(degree));
+		
 		return new IntPoint(
-				x * cachedCos - y * cachedSin,
-				y * cachedCos + x * cachedSin);
+				x * cos - y * sin,
+				y * cos + x * sin);
 	}
 	
 	/*
 	 * Draw a rotated polygon
 	 */
-	public void drawRotatedPolygon(IntPoint[] points, Graphics g) {
+	protected void drawIntPointPolygon(IntPoint[] points, Graphics g) {
 		int[] xPoints = new int[points.length];
 		int[] yPoints = new int[points.length];
 		for(int i = 0; i < points.length; i++) {
@@ -287,6 +316,16 @@ public abstract class Tank implements Renderable {
 		if(health <= 0)
 			kill();
 	}
+	
+	public void setSize(double size) {
+		this.size = size;
+	}
+	
+	public boolean isDead() {
+		return isDead;
+	}
+	
+	public abstract String getType();
 	
 	@Override
 	public String toString() {

@@ -19,7 +19,9 @@ public abstract class Bullet implements Renderable {
 	public double speed;
 	public double x, y;
 	public double damage;
+	public double collisionRadius;
 	
+	protected double distanceTravelled;
 	double cachedSin, cachedCos;
 	
 	public Bullet(BattleScene scene, String ownerID, double x, double y, double direction) {
@@ -29,6 +31,8 @@ public abstract class Bullet implements Renderable {
 		this.y = y;
 		this.speed = 0;
 		this.damage = 0;
+		this.collisionRadius = 0;
+		this.distanceTravelled = 0;
 		setDirection(direction);
 	}
 	
@@ -50,6 +54,7 @@ public abstract class Bullet implements Renderable {
 	protected void updateMovement() {
 		x += cachedSin * speed;
 		y -= cachedCos * speed;
+		distanceTravelled += speed;
 	}
 	
 	public void update() {

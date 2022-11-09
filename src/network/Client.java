@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import _main._Settings;
+import _main.Boot;
 
 /*
  * This is the client, it can be ran and if so, 
@@ -56,7 +56,7 @@ public class Client extends NetworkActivityCaller implements MessageNode {
     		}
     	}
     	
-    	if(_Settings.createDebugConsoles)
+    	if(Boot.createDebugConsoles)
     		debugConsoleDialogue = new ConsoleDebugWindow(this, this);
 
     	// tell the network I'd like to join!
@@ -133,6 +133,6 @@ public class Client extends NetworkActivityCaller implements MessageNode {
     // runs the client
     public static void main(String[] args) throws Exception 
     {
-    	new Client(_Settings.clientCreatesServer, _Settings.defaultServerAdress, _Settings.defaultPort, "Testing");
+    	new Client(Boot.clientCreatesServer, Boot.defaultServerAdress, Boot.defaultPort, "Testing");
     }
 }

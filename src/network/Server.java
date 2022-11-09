@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import _main._Settings;
+import _main.Boot;
 
 /*
  * This class will create a network and create the client thread connections. It can also send and receive messages
@@ -51,7 +51,7 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 		pool.execute(() -> newPlayerListenerServerThread());
 		
 		
-		if(_Settings.createDebugConsoles)
+		if(Boot.createDebugConsoles)
 			new ConsoleDebugWindow(this, this);
 	}
 
@@ -142,7 +142,7 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 		String build = "";
 		
 		for(ServerClientConnection player : players.values())
-			build += player.getID() + " " + player.getName() + " ";
+			build += player.getID() + " " + player.getName() + " " + player.getTankType() + " ";
 		
 		return build;
 	}
@@ -155,6 +155,6 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 	 * This class can be run alone, in which it'll create the network and start it
 	 */
 	public static void main(String[] args) throws IOException {
-		new Server(_Settings.defaultPort);
+		new Server(Boot.defaultPort);
 	}
 }

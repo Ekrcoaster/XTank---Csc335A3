@@ -11,12 +11,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import _main._Settings;
+import _main.Boot;
+import battle.bullets.BombBullet;
 import battle.bullets.Bullet;
 import battle.bullets.GenericBullet;
+import battle.bullets.MagicBullet;
+import battle.bullets.ScoutBullet;
+import battle.bullets.SturdyBullet;
 import battle.map.*;
-import battle.tanks.GenericTank;
-import battle.tanks.Tank;
+import battle.tanks.*;
 import network.Client;
 import network.Message;
 import network.NetworkListener;
@@ -38,22 +41,22 @@ public class BattleScene extends Scene implements NetworkListener {
 	public BattleMap map;
 	ArrayList<Renderable> itemsToRender;
 	
-	public BattleScene(String playerID, String playerName, ArrayList<String> otherPlayerIDs, ArrayList<String> otherPlayerNames, boolean isServer, String mapName) {
+	public BattleScene(String playerID, String playerName, String playerTankType, ArrayList<String> otherPlayerIDs, ArrayList<String> otherPlayerNames, ArrayList<String> otherPlayerTankTypes, boolean isServer, String mapName) {
 		this.players = new HashMap<String, Tank>();
 		this.bullets = new ArrayList<Bullet>();
 		this.itemsToRender = new ArrayList<Renderable>();
 		this.playerID = playerID;
 		this.isServer = isServer;
 		
-		this.map = new BattleMap(mapName, _Settings.windowSize.width - 15, _Settings.windowSize.height - 40);
+		this.map = new BattleMap(mapName, Boot.windowSize.width - 15, Boot.windowSize.height - 40);
 		
 		// create the client's tank (if this instance is even a client)
 		if(playerID != null)
-			players.put(playerID, createTank(playerID, playerName, false)); 
+			players.put(playerID, createTank(playerID, playerName, playerTankType, false)); 
 		
 		// create the other player's tanks
 		for(int i = 0; i < otherPlayerIDs.size(); i++) {
-			Tank newTank = createTank(otherPlayerIDs.get(i), otherPlayerNames.get(i), true);
+			Tank newTank = createTank(otherPlayerIDs.get(i), otherPlayerNames.get(i), otherPlayerTankTypes.get(i), true);
 			players.put(otherPlayerIDs.get(i), newTank);
 		}
 		
@@ -101,7 +104,7 @@ public class BattleScene extends Scene implements NetworkListener {
 		gameTickThread = new Thread(() -> {
 			// get the last time, the fps tick ratio, and the delta
 			long lastTime = System.nanoTime();
-			double ratio = 1000000000.0 / (double)_Settings.BATTLE_FPS;
+			double ratio = 1000000000.0 / (double)Boot.BATTLE_FPS;
 			double delta = 0;
 
 			// run as fast as humanly possible
@@ -138,10 +141,10 @@ public class BattleScene extends Scene implements NetworkListener {
 			bullet.update();
 			
 			// check if this bullet is colliding with any tank
-			Tank collidedWith = getCollidedTank(bullet.x, bullet.y);
+			Tank collidedWith = getCollidedTank(bullet.x, bullet.y, bullet.collisionRadius);
 			
 			// if so, tell the tank, then calculate the damage
-			if(collidedWith != null) {
+			if(collidedWith != null && !collidedWith.getID().equals(bullet.ownerID)) {
 				bullet.onTankCollision(collidedWith);
 				
 				// if we are the server, send it out to the client
@@ -232,13 +235,13 @@ public class BattleScene extends Scene implements NetworkListener {
 	}
 	
 	public void placeTankAtRandomPosition(Tank tank) {
-		tank.setX((Math.random() * _Settings.windowSize.getWidth() * 0.75)+  _Settings.windowSize.getWidth() * 0.15);
-		tank.setY((Math.random() * _Settings.windowSize.getHeight() * 0.75) +  _Settings.windowSize.getHeight() * 0.15);
+		tank.setX((Math.random() * Boot.windowSize.getWidth() * 0.75)+  Boot.windowSize.getWidth() * 0.15);
+		tank.setY((Math.random() * Boot.windowSize.getHeight() * 0.75) +  Boot.windowSize.getHeight() * 0.15);
 		
 		// check for collisions
 		ColliderHitPoint point = tank.calculateCollisions();
-		tank.setX(point.x);
-		tank.setY(point.y);
+		tank.setX(point.x + tank.getSize());
+		tank.setY(point.y + tank.getSize());
 		tank.savePositionToServer();
 	}
 	
@@ -255,15 +258,40 @@ public class BattleScene extends Scene implements NetworkListener {
 		
 	}
 	
-	private Tank createTank(String playerID, String name, boolean serverControlled) {
-		Tank tank = new GenericTank(playerID, name, serverControlled, this);
+	private Tank createTank(String playerID, String name, String type, boolean serverControlled) {
+		Tank tank;
+		
+		switch(type) {
+			case "bomb":
+				tank = new BombTank(playerID, name, serverControlled, this);
+				break;
+			case "magic":
+				tank = new MagicTank(playerID, name, serverControlled, this);
+				break;
+			case "scout":
+				tank = new ScoutTank(playerID, name, serverControlled, this);
+				break;
+			case "sturdy":
+				tank = new SturdyTank(playerID, name, serverControlled, this);
+				break;
+			default:
+				tank = new GenericTank(playerID, name, serverControlled, this);
+				break;
+		}
+		
 		tank.setX(500);
 		tank.setY(500);
 		return tank;
 	}
 	
 	private Bullet createBullet(String playerID, String bulletType, double x, double y, double direction) {
-		return new GenericBullet(this, playerID, x, y, direction);
+		switch(bulletType) {
+			case "bomb": return new BombBullet(this, playerID, x, y, direction);
+			case "magic": return new MagicBullet(this, playerID, x, y, direction);
+			case "scout": return new ScoutBullet(this, playerID, x, y, direction);
+			case "sturdy": return new SturdyBullet(this, playerID, x, y, direction);
+			default: return new GenericBullet(this, playerID, x, y, direction);
+		}
 	}
 	
 	public void destroyBullet(Bullet bullet) {
@@ -279,9 +307,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		itemsToRender.remove(item);
 	}
 	
-	public Tank getCollidedTank(double x, double y) {
+	public Tank getCollidedTank(double x, double y, double radius) {
 		for(Tank tank : players.values()) {
-			ColliderRect rect = tank.getColliderRect(5);
+			ColliderRect rect = tank.getColliderRect(3 + (int)radius);
 			if(rect != null && rect.isInside(x, y))
 				return tank;
 		}

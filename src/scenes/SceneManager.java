@@ -6,7 +6,7 @@ package scenes;
 
 import java.util.ArrayList;
 
-import _main._Settings;
+import _main.Boot;
 import network.Client;
 import network.Message;
 
@@ -21,16 +21,20 @@ public class SceneManager {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new Client(true, _Settings.defaultServerAdress, _Settings.defaultPort, "me");
+		new Client(true, Boot.defaultServerAdress, Boot.defaultPort, "me");
 		ArrayList<String> tempPlayerIDS = new ArrayList<String>();
 		ArrayList<String> tempPlayerNames = new ArrayList<String>();
+		ArrayList<String> tempPlayerTypes = new ArrayList<String>();
 		tempPlayerIDS.add("000");
 		tempPlayerNames.add("Bob");
+		tempPlayerTypes.add("generic");
 		tempPlayerIDS.add("afcfs");
 		tempPlayerNames.add("Taylor Swift");
+		tempPlayerTypes.add("sturdy");
 		tempPlayerIDS.add("sdsdsd");
 		tempPlayerNames.add("Adele");
-		BattleScene scene = new BattleScene(Client.client.id, "you!", tempPlayerIDS, tempPlayerNames, true, "map1");
+		tempPlayerTypes.add("scout");
+		BattleScene scene = new BattleScene(Client.client.id, "you!", "bomb", tempPlayerIDS, tempPlayerNames, tempPlayerTypes, true, "map1");
 		setScene(scene);
 		// place the tanks at random spots
 		scene.onMessage(new Message("sPos 500 500", "000"));

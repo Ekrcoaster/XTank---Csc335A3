@@ -28,6 +28,8 @@ rBullet <playerId> <bulletType> <x> <y> <dir>
 health <playerId> <newHealth>
 	Message from the server: this tank's new health is x
 
+rTankType <playerId> <tankTypeAsString>
+	Message from the server: this player has changed their tank type!
 
 
  -- CLIENT -> SERVER --
@@ -49,3 +51,6 @@ sDir <x> <y>
 
 sBullet <bulletType> <x> <y> <dir>
 	This will tell the server that a bullet has been shot
+	
+sTankType <tankTypeAsString>
+	This will tell the server that a player has changed tanks!
