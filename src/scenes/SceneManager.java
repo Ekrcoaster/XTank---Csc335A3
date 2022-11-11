@@ -21,7 +21,7 @@ public class SceneManager {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		ResultsScene scen = new ResultsScene(Boot.defaultMapType);
+		ResultsScene scen = new ResultsScene(Boot.defaultMapType, "test");
 		setScene(scen);
 		scen.onMessage(new Message("results 000 Bob 0.0 magic sdsdsd Adele 0.0 scout 8ux2u1my you! 45.0 magic afcfs Taylor_Swift 0.0 bomb", null));
 		/*

@@ -15,10 +15,12 @@ public class ResultsScene extends Scene implements NetworkListener {
 
 	ResultsSceneUI ui;
 	String mapName;
+	String playerName;
 	public ArrayList<ArchievedTank> archievedTanks = new ArrayList<ArchievedTank>();
 	
-	public ResultsScene(String mapName) {
+	public ResultsScene(String mapName, String playerName) {
 		this.mapName = mapName;
+		this.playerName = playerName;
 	}
 	
 	@Override
@@ -64,6 +66,9 @@ public class ResultsScene extends Scene implements NetworkListener {
 				archievedTanks.remove(index);
 			}
 		}
+		
+		if(message.is("start") && message.getArg(0).equals("join"))
+			SceneManager.setScene(new JoinScene(Client.client != null, Server.server != null, playerName, mapName));
 	}
 	
 	void requestLeave() {
@@ -77,6 +82,7 @@ public class ResultsScene extends Scene implements NetworkListener {
 	
 	public void playAgain() {
 		SceneManager.setScene(new JoinScene(Client.client != null, Server.server != null, Client.client == null ? null : Client.client.getName(), mapName));
+		Server.server.sendMessage("start join");
 	}
 	
 	public void toTitle() {

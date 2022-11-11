@@ -7,6 +7,7 @@ package ui;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -34,7 +35,8 @@ public class JoinSceneUI extends JPanel {
 	JScrollPane scroll;
 	
 	JButton beginGameButton;
-	
+
+	DropdownField mapChooser;
 	ArrayList<TankTypePreviewUI> types;
 	
 	boolean server;
@@ -74,6 +76,22 @@ public class JoinSceneUI extends JPanel {
 		createJoinListPanel(mapName, server && !client ? 120 : 0);
 		if(client)
 			createTankOptionsPanel();
+		
+		if(server) {
+			// get all of the maps from the directory
+			File directory = new File("./maps");
+			File[] files = directory.listFiles();
+			
+			// put the names into the dropdown
+			String[] names = new String[files.length];
+			for(int i = 0; i < files.length; i++) {
+				names[i] = files[i].getName().replace(".txt", "");
+			}
+			
+			//mapChooser = new DropdownField("Choose your Map:", Boot.defaultMapType, names, 100, 70, 20);
+			//mapChooser.setBounds(0, 0, 100, 100);
+			//add(mapChooser);
+		}
 		
 		update();
         
@@ -160,6 +178,10 @@ public class JoinSceneUI extends JPanel {
 	public void update() {
 		for(int i = 0; i < types.size(); i++)
 			types.get(i).setSelected(i == selectedTankType);
+	}
+	
+	public void clearPlayerNames() {
+		playerListModel.removeAllElements();
 	}
 
 	public void addPlayerName(String name) {

@@ -141,7 +141,7 @@ public class BattleScene extends Scene implements NetworkListener {
 			
 			// time is up, swap the scene
 			if(timeOnWinnerScreen > 130) {
-				SceneManager.setScene(new ResultsScene(map.getMapName()));
+				SceneManager.setScene(new ResultsScene(map.getMapName(), players.get(playerID).getName()));
 				if(isServer) {
 					Server.server.sendMessage("start results");
 					Server.server.sendMessage(generateDataForResults());
@@ -191,6 +191,7 @@ public class BattleScene extends Scene implements NetworkListener {
 	 */
 	@Override
 	public void onMessage(Message message) {
+		System.out.println(message);
 		if(isServer) {
 			if(message.fromID == null)
 				return;
@@ -236,7 +237,7 @@ public class BattleScene extends Scene implements NetworkListener {
 				updateTankBulletDamage(message.getArg(0), message.doubleArg(1));
 			
 			if(message.is("start") && message.getArg(0).equals("results"))
-				SceneManager.setScene(new ResultsScene(map.getMapName()));
+				SceneManager.setScene(new ResultsScene(map.getMapName(), players.get(playerID).getName()));
 			
 			if(message.is("aClientExited"))
 				updateTankHealth(message.getArg(0), 0);

@@ -5,6 +5,7 @@
  */
 package scenes;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import _main.Boot;
@@ -12,6 +13,7 @@ import network.Client;
 import network.Message;
 import network.NetworkListener;
 import network.Server;
+import ui.DropdownField;
 import ui.JoinSceneUI;
 import ui.WindowManager;
 
@@ -39,6 +41,8 @@ public class JoinScene extends Scene implements NetworkListener {
 		this.myPlayerTank = Boot.defaultTankType;
 		
 		this.mapName = mapName;
+		
+		
 	}
 
 	@Override
@@ -83,12 +87,12 @@ public class JoinScene extends Scene implements NetworkListener {
 			}
 		}
 		
-		enterBattleScene();
+		enterBattleScene(mapName);
 		
-		Server.server.sendMessageToAllBut("start battle ", myPlayerID);
+		Server.server.sendMessageToAllBut("start battle " + mapName, myPlayerID);
 	}
 	
-	public void enterBattleScene() {
+	public void enterBattleScene(String map) {
 		// if my player ID is real, it is gonna be in the list of playerIDs, so remove it
 		
 		if(playerIDs.contains(myPlayerID)) {
@@ -98,7 +102,7 @@ public class JoinScene extends Scene implements NetworkListener {
 			playerTankTypes.remove(index);
 		}
 		
-		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, myPlayerTank, playerIDs, playerNames, playerTankTypes, server, mapName);
+		BattleScene scene = new BattleScene(myPlayerID, myPlayerName, myPlayerTank, playerIDs, playerNames, playerTankTypes, server, map);
 		SceneManager.setScene(scene);
 	}
 
@@ -108,6 +112,11 @@ public class JoinScene extends Scene implements NetworkListener {
 	 */
 	public void populatePlayerList(String listReceived) {
 		String[] pieces = listReceived.split(" ");
+		playerIDs = new ArrayList<String>();
+		playerNames = new ArrayList<String>();
+		playerTankTypes = new ArrayList<String>();
+		
+		ui.clearPlayerNames();
 		
 		// if there is just 1 entree, ignore because its not valid
 		if(pieces.length < 2) return;
@@ -152,7 +161,7 @@ public class JoinScene extends Scene implements NetworkListener {
 		// if the server told us to go to the battle scene
 		if(message.is("start")) {
 			if(message.getArg(0).equals("battle")) {
-				enterBattleScene();
+				enterBattleScene(message.getArg(1));
 			}
 		}
 		
