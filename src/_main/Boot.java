@@ -15,7 +15,7 @@ public class Boot {
 	public static final boolean createDebugConsoles = false;
 	public static final boolean clientCreatesServer = true;
 	public static final String defaultTankType = "generic";
-	public static final String defaultMapType = "maze";
+	public static final String defaultMapType = "empty";
 	public static final Dimension windowSize = new Dimension(900, 600);
 	public static final int BATTLE_FPS = 30;
 	

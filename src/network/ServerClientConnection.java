@@ -28,10 +28,13 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	String name;
 	String tankType;
 	
+	boolean exit;
+	
 	public ServerClientConnection(String id, String name) {
 		this.id = id;
 		this.name = name;
 		this.tankType = Boot.defaultTankType;
+		this.exit = false;
 	}
 	
 	/*
@@ -55,20 +58,26 @@ public class ServerClientConnection implements Runnable, MessageNode {
 			// once a connection has been established, generate an ID and send it to the player
 			sendMessage("id " + id);
 			
-			while (getInput().hasNextLine()) 
+			while (!exit && getInput().hasNextLine()) 
 			{
 				String command = getInput().nextLine();
 				Message message = new Message(command, id);
 				
-				// handle an exit command
-				if (message.is("exit"))
-					return;
 
 				// the order here doesn't matter, i chose to tell the server first before myself
 				// so the debug consoles look more readable
 				Server.server.messageReceived(message);
 				messageReceived(message);
+				
+				// handle when the client leaves, just cancel exit command, exit out of this loop
+				if (message.is("clientExit")) {
+					exit = true;
+					Server.server.sendMessageToAllBut("aClientExited " + id, id);
+					return;
+				}
+				
 			}
+			socket.close();
 		} 
 		catch (Exception e) 
 		{
@@ -103,7 +112,7 @@ public class ServerClientConnection implements Runnable, MessageNode {
 		}
 
 		if(message.is("sDir")) {
-			Server.server.sendMessageToAllBut("rDir " + id + " " + message.joinedArgs(), id);
+			//Server.server.sendMessageToAllBut("rDir " + id + " " + message.joinedArgs(), id);
 		}
 		
 		if(message.is("playerList")) {
@@ -117,6 +126,11 @@ public class ServerClientConnection implements Runnable, MessageNode {
 			tankType = message.getArg(0);
 			Server.server.sendMessageToAllBut("rTankType " + id + " " + message.joinedArgs(), id);
 		}
+	}
+	
+	public void close() {
+		sendMessage("serverExit");
+		exit = true;
 	}
 	
 	@Override
@@ -134,6 +148,10 @@ public class ServerClientConnection implements Runnable, MessageNode {
 	
 	public void setSocket(Socket socket) {
 		this.socket = socket;
+	}
+	
+	public Socket getSocket() {
+		return this.socket;
 	}
 
 	public void setInput(Scanner input) { this.input = input;}

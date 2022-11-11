@@ -10,7 +10,7 @@ retPlayerList
 	This will return to the client (who asked) the list of the connected players' IDs and names
 	format: clientIDA clientNameA clientIDB clientNameB clientIDC clientNameC
 
-start <battle>
+start <battle|results>
 	This will tell all of the clients to switch to the battle
 	
 retMyID <id>
@@ -30,6 +30,12 @@ health <playerId> <newHealth>
 
 rTankType <playerId> <tankTypeAsString>
 	Message from the server: this player has changed their tank type!
+	
+bulletDamage <playerId> <newBulletDamage>
+	Message from the server: this player's bullet damage has been set!
+	
+aClientExited <playerId>
+	Message from the server: this player has left!
 
 
  -- CLIENT -> SERVER --

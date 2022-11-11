@@ -53,4 +53,5 @@ public class SturdyTank extends Tank {
 	public String getType() {
 		return "sturdy";
 	}
+
 }

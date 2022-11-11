@@ -13,7 +13,7 @@ import network.Message;
 import network.NetworkListener;
 import network.Server;
 import ui.JoinSceneUI;
-import ui.WindowHolder;
+import ui.WindowManager;
 
 public class JoinScene extends Scene implements NetworkListener {
 	
@@ -47,7 +47,7 @@ public class JoinScene extends Scene implements NetworkListener {
 		playerIDs = new ArrayList<String>();
 		playerNames = new ArrayList<String>();
 		playerTankTypes = new ArrayList<String>();
-		WindowHolder.setPanel(ui);
+		WindowManager.setPanel(ui);
 		
 		// if we are a client
 		if(client) {
@@ -62,6 +62,7 @@ public class JoinScene extends Scene implements NetworkListener {
 		// if we are a server ONLY
 		} else if(server) {
 			Server.server.addListener(this);
+			Server.server.acceptingNewPlayers = true;
 
 			// because we are already the server, we can just ask for the player list ourselves
 			populatePlayerList(Server.server.constructPlayerList());

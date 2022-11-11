@@ -8,6 +8,8 @@ package network;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +39,9 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 	ServerSocket listener;
 	int port;
 	
+	boolean exit;
+	public boolean acceptingNewPlayers;
+	
 	/*
 	 * When the network is created, startup the network and thread pool
 	 */
@@ -50,7 +55,8 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 		pool = Executors.newFixedThreadPool(200);
 		pool.execute(() -> newPlayerListenerServerThread());
 		
-		
+		exit = false;
+		acceptingNewPlayers = true;
 		if(Boot.createDebugConsoles)
 			new ConsoleDebugWindow(this, this);
 	}
@@ -65,21 +71,35 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 		
 		// begin the listening loop for the network's connected client class
 		// this loop will forever listen for new players, if ones connect, it'll add them to the player list
-		while(true) {
-            try {
-            	
-            	// setup the listener to the next one (if it exists)
-            	// then execute once the listener has joined!
-            	nextPotentialPlayer.setSocket(listener.accept());
-            	pool.execute(nextPotentialPlayer);
-            	
-            	// nice, someone connected. Add the created potential to the player list, then create a new potential slot
-            	players.put(nextPotentialPlayer.getID(), nextPotentialPlayer);
-        		newPotentialSlot();
+		while(!exit) {
+			if(acceptingNewPlayers) {
+				try {
+	            	// setup the listener to the next one (if it exists)
+	            	// then execute once the listener has joined!
+					Socket socket = null;
+					try {
+						socket = listener.accept();
+					} catch (SocketException e){ }
+					if(socket != null) {
 
-			} catch (IOException e) {
-				e.printStackTrace();
+		            	nextPotentialPlayer.setSocket(socket);
+		            	pool.execute(nextPotentialPlayer);
+		            	
+		            	// nice, someone connected. Add the created potential to the player list, then create a new potential slot
+		            	players.put(nextPotentialPlayer.getID(), nextPotentialPlayer);
+		        		newPotentialSlot();
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+		}
+		
+		try {
+			listener.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -100,7 +120,7 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 	 * this is called once a player has joined, add in a new slot!
 	 */
 	public boolean playerAttemptConnect(String connectedID) {
-		return true;
+		return acceptingNewPlayers;
 	}
 	
 	/*
@@ -128,6 +148,20 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 	@Override
 	public void messageReceived(Message message) {
 		callListenersOnMessage(message);
+	}
+	
+	public void close() {
+		exit = true;
+		acceptingNewPlayers = false;
+		for(ServerClientConnection player : players.values()) {
+			player.close();
+		}
+		Server.server = null;
+		try {
+			listener.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*

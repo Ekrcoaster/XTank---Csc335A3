@@ -9,7 +9,7 @@ package scenes;
 import network.Client;
 import network.Server;
 import ui.TitleSceneUI;
-import ui.WindowHolder;
+import ui.WindowManager;
 
 public class TitleScene extends Scene {
 	
@@ -18,7 +18,7 @@ public class TitleScene extends Scene {
 	@Override
 	public void init() {
 		// create the UI
-		ui = (TitleSceneUI) WindowHolder.setPanel(new TitleSceneUI(this));
+		ui = (TitleSceneUI) WindowManager.setPanel(new TitleSceneUI(this));
 	}
 
 	@Override

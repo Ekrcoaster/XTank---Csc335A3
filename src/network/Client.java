@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.util.Scanner;
 
 import _main.Boot;
+import scenes.SceneManager;
+import scenes.TitleScene;
 
 /*
  * This is the client, it can be ran and if so, 
@@ -30,6 +32,8 @@ public class Client extends NetworkActivityCaller implements MessageNode {
     public int port;
     public String id;
     public String name;
+    
+    boolean exit;
 
     public Client(boolean createServerIfNeeded, String ipAddress, int port, String name) throws Exception
     {
@@ -37,6 +41,7 @@ public class Client extends NetworkActivityCaller implements MessageNode {
     	this.port = port;
     	this.serverAddress = ipAddress;
     	this.name = name;
+    	this.exit = false;
     	
     	// if the network wasn't able to be connected to, maybe it doesn't exist yet? So create it
     	if(!attemptConnect()) {
@@ -88,12 +93,20 @@ public class Client extends NetworkActivityCaller implements MessageNode {
 		if(message.is("id"))
 			this.id = message.getArg(0);
 		
+		if(message.is("serverExit")) {
+			SceneManager.setScene(new TitleScene());
+		}
+		
 		callListenersOnMessage(message);
 	}
 
 	@Override
 	public String getID() {
 		return id;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
     /**
@@ -109,12 +122,12 @@ public class Client extends NetworkActivityCaller implements MessageNode {
     {
         try 
         {
-            while (in.hasNextLine()) 
+            while (!exit && in.hasNextLine()) 
             {
                 messageReceived(new Message(in.nextLine(), null));
             }
             
-            sendMessage("exit");
+            sendMessage("clientExit");
         } 
         catch (Exception e) 
         {
@@ -128,6 +141,11 @@ public class Client extends NetworkActivityCaller implements MessageNode {
         	}
             if(debugConsoleDialogue != null) debugConsoleDialogue.exit();
         }
+    }
+    
+    public void close() {
+        exit = false;
+        Client.client = null;
     }
 
     // runs the client

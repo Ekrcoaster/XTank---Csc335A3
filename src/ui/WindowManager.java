@@ -7,13 +7,14 @@ package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import _main.Boot;
 
-public class WindowHolder {
+public class WindowManager {
 	public static JFrame frame;
 	public static JPanel active;
 	
@@ -26,6 +27,7 @@ public class WindowHolder {
 			frame.setPreferredSize(Boot.windowSize);
 			frame.setVisible(true);
 			frame.setResizable(false);
+			frame.setTitle("Csc 335 - X Tank Game (Ethan Rees)");
 	        
 			frame.setLayout(new BorderLayout());
 		}
@@ -37,5 +39,9 @@ public class WindowHolder {
 		frame.pack();
 		
 		return panel;
+	}
+	
+	public static void closeWindow() {
+		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 	}
 }

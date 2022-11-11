@@ -20,7 +20,7 @@ import network.NetworkListener;
 import scenes.BattleScene;
 import ui.Renderable;
 
-public abstract class Tank implements Renderable {
+public abstract class Tank implements Renderable, Comparable<Tank> {
 	BattleScene scene;
 	public boolean isServerControlled;
 	
@@ -36,6 +36,8 @@ public abstract class Tank implements Renderable {
 
 	double cachedSin, cachedCos;
 	protected double bulletActiveCooldown;
+	
+	public double damageDealt;
 	
 	public Tank(String id, String name, boolean isServerControlled, BattleScene scene) {
 		this.isServerControlled = isServerControlled;
@@ -54,6 +56,7 @@ public abstract class Tank implements Renderable {
 		this.rotateSpeed = 0;
 		this.bulletSpeedCooldown = 0;
 		this.bulletActiveCooldown = 0;
+		this.damageDealt = 0;
 	}
 	
 	/*
@@ -167,7 +170,7 @@ public abstract class Tank implements Renderable {
 	public void render(Graphics g) {
 		Color tankColor = getColor();
 		if(isDead) tankColor = new Color(40, 40, 40);
-		double gunLength = 1-(bulletActiveCooldown / (double)bulletSpeedCooldown)*0.4+0.3;
+		double gunLength = getBulletCooldownPercent()*0.4+0.3;
 		
 		drawTankBody(g, tankColor);
 		drawTankGun(g, tankColor, gunLength);
@@ -267,6 +270,12 @@ public abstract class Tank implements Renderable {
 		return new ColliderRect(x - size - padding, y - size - padding, x + size + padding, y + size + padding);
 	}
 	
+	// compare tanks by damage dealt
+	@Override
+	public int compareTo(Tank o) {
+		return Integer.compare((int)(o.damageDealt*10), (int)(damageDealt*10));
+	}
+	
 	protected Color getColor() {
 		if(isServerControlled)
 			return Color.blue;
@@ -301,6 +310,14 @@ public abstract class Tank implements Renderable {
 		return id;
 	}
 
+	public String getName() {
+		return name;
+	}
+	
+	public double getBulletCooldownPercent() {
+		return Math.min(1, 1-(bulletActiveCooldown / bulletSpeedCooldown));
+	}
+
 	public void setDirection(double direction) {
 		this.direction = direction;
 		cachedSin = Math.sin(Math.toRadians(direction));
@@ -330,6 +347,10 @@ public abstract class Tank implements Renderable {
 	@Override
 	public String toString() {
 		return "[tank " + id + " (" + name + "), server: " + isServerControlled + "]";
+	}
+	
+	public String toEncoded() {
+		return id + " " + name.replace(" ", "_") + " " + damageDealt + " " + this.getType();
 	}
 }
 
