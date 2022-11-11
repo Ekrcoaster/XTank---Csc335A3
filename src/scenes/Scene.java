@@ -8,4 +8,15 @@ package scenes;
 public abstract class Scene {
 	public abstract void init();
 	public abstract void exit();
+	public abstract String getID();
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o == null)
+			return false;
+		if(o instanceof Scene) {
+			return ((Scene)o).getID().equals(getID());
+		}
+		return false;
+	}
 }

@@ -56,4 +56,6 @@ public class TitleScene extends Scene {
 			}
 		}
 	}
+	@Override
+	public String getID() {return "title";}
 }

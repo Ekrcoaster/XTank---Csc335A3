@@ -119,4 +119,6 @@ public class ResultsScene extends Scene implements NetworkListener {
 	public void onSentMessage(Message message) { }
 	@Override
 	public void exit() { }
+	@Override
+	public String getID() {return "results";}
 }

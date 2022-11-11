@@ -472,4 +472,7 @@ public class BattleScene extends Scene implements NetworkListener {
 
 	@Override
 	public void onSentMessage(Message message) {}
+
+	@Override
+	public String getID() {return "battle";}
 }

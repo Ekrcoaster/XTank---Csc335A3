@@ -41,8 +41,6 @@ public class JoinScene extends Scene implements NetworkListener {
 		this.myPlayerTank = Boot.defaultTankType;
 		
 		this.mapName = mapName;
-		
-		
 	}
 
 	@Override
@@ -90,6 +88,16 @@ public class JoinScene extends Scene implements NetworkListener {
 		enterBattleScene(mapName);
 		
 		Server.server.sendMessageToAllBut("start battle " + mapName, myPlayerID);
+	}
+	
+	public void returnToTitle() {
+		if(server) {
+			Server.server.close();
+		}
+		if(client) {
+			Client.client.close();
+		}
+		SceneManager.setScene(new TitleScene());
 	}
 	
 	/*
@@ -194,13 +202,15 @@ public class JoinScene extends Scene implements NetworkListener {
 
 	@Override
 	public void exit() {
-		if(server) {
+		if(server && Server.server != null) {
 			Server.server.removeListener(this);
-		} else if(client) {
+		} else if(client && Client.client != null) {
 			Client.client.removeListener(this);
 		}
 	}
 	
 	@Override
 	public void onSentMessage(Message message) { }
+	@Override
+	public String getID() {return "join";}
 }

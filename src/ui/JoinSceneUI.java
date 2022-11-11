@@ -41,16 +41,18 @@ public class JoinSceneUI extends JPanel {
 	
 	JLabel playerListTitle;
 	
+	JButton exitButton;
+	
 	boolean server;
 	
 	int selectedTankType;
 	
 	String[] tankNames = {
-		"Generic Tank",
-		"Sturdy Tank",
-		"Scout Tank",
-		"Magic Tank",
-		"Bomb Tank"
+		"generic",
+		"sturdy",
+		"scout",
+		"magic",
+		"bomb"
 	};
 	String[] tankDescriptions = {
 		"Pretty generic and not unqiue in any way, shape, or form!",
@@ -102,6 +104,14 @@ public class JoinSceneUI extends JPanel {
 			});
 			joinListPanel.add(mapChooser);
 		}
+		
+		exitButton = new JButton("< Exit");
+		exitButton.setBounds(10, 10, 70, 20);
+		exitButton.addActionListener(l -> scene.returnToTitle());
+		if(server && !client)
+			add(exitButton);
+		else
+			joinListPanel.add(exitButton);
 		
 		update();
         
@@ -184,7 +194,8 @@ public class JoinSceneUI extends JPanel {
 		
 		// draw the different tank types out
 		for(int i = 0; i < tankNames.length; i++) {
-			TankTypePreviewUI ui = new TankTypePreviewUI(tankNames[i], tankDescriptions[i], tankInstances[i], xOffset, i * 100 + 40, (int)(width * 0.75), 90);
+			TankTypePreviewUI ui = new TankTypePreviewUI(tankNames[i].toUpperCase().charAt(0) + tankNames[i].substring(1) + " Tank", tankDescriptions[i], tankInstances[i], xOffset, i * 100 + 40, (int)(width * 0.75), 90);
+			
 			types.add(ui);
 			final int index = i;
 			
@@ -237,6 +248,11 @@ public class JoinSceneUI extends JPanel {
 	 */
 	public void updatePlayerName(int changeIndex, String type) {
 		playerListModel.setElementAt(scene.playerNames.get(changeIndex).replace("_", " ") + "   (the " + type + " tank)", changeIndex);
+		for(int i = 0; i < tankNames.length; i++) {
+			if(tankNames[i].equals(type))
+				selectedTankType = i;
+		}
+		update();
 	}
 
 }

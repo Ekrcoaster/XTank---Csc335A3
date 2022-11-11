@@ -63,7 +63,6 @@ public class ServerClientConnection implements Runnable, MessageNode {
 				String command = getInput().nextLine();
 				Message message = new Message(command, id);
 				
-
 				// the order here doesn't matter, i chose to tell the server first before myself
 				// so the debug consoles look more readable
 				Server.server.messageReceived(message);
@@ -71,6 +70,7 @@ public class ServerClientConnection implements Runnable, MessageNode {
 				
 				// handle when the client leaves, just cancel exit command, exit out of this loop
 				if (message.is("clientExit")) {
+					System.out.println("they left");
 					exit = true;
 					Server.server.sendMessageToAllBut("aClientExited " + id, id);
 					return;
