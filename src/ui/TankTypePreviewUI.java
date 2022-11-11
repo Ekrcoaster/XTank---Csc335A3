@@ -1,3 +1,8 @@
+/*
+ * Author: Ethan Rees
+ * This will draw a tank type onto the screen, as a selectable panel! It does this by getting an instance of a tank,
+ * isolating it and making it functionless, then using its render function to render to the screen
+ */
 package ui;
 
 import java.awt.Color;
@@ -23,23 +28,25 @@ public class TankTypePreviewUI extends JPanel {
 	Tank renderInstance;
 	public TankTypePreviewUI(String name, String description, Tank renderInstance, int x, int y, int width, int height) {
 		this.renderInstance = renderInstance;	
-		
+		// setup panel
 		setBounds(x, y, width, height);
 		setLayout(null);
 		setSelected(false);
+		setFocusable(true);
 
+		// tank name
 		JLabel label = new JLabel(name);
 	    label.setFont(new Font("TimesRoman", Font.BOLD, 20));
 		label.setBounds(height, 10, width - height, 25);
 		add(label);
 		
+		// tank description
 		JLabel descLabel = new JLabel("<html>" + description + "</html>");
 		descLabel.setFont(getFont().deriveFont(Font.PLAIN));
 		descLabel.setBounds(height, 25, width - height, height-25);
 		add(descLabel);
 		
-		setFocusable(true);
-		
+		// the tank preview window
 		int margin = 10;
 		renderInstance.setX((height-margin*2) / 2);
 		renderInstance.setY((height-margin) / 2);
@@ -49,6 +56,9 @@ public class TankTypePreviewUI extends JPanel {
 		add(preview);
 	}
 	
+	/*
+	 * Set if it should be rendered as selected or not
+	 */
 	public void setSelected(boolean selected) {
 		setBorder(BorderFactory.createLineBorder(selected ? Color.blue : Color.black, selected ? 4 : 2));
 	}
@@ -58,6 +68,10 @@ public class TankTypePreviewUI extends JPanel {
 	}
 }
 
+/*
+ * This class is the class that draws the display, 
+ * it overrides the jpanel and it just renders the tank into the space
+ */
 class TankPreview extends JPanel {
 	Tank tank;
 	int size;

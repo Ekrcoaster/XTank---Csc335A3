@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * This will draw the results screen
+ */
 package ui;
 
 import java.awt.Color;
@@ -27,6 +31,7 @@ public class ResultsSceneUI extends JPanel {
 		this.scene = scene;
 		setLayout(null);
 		
+		// create the list
 		int logWidth = 170;
 		this.playerListModel = new DefaultListModel<String>();
 		playerListModel.addElement("loading data from server...");
@@ -35,6 +40,7 @@ public class ResultsSceneUI extends JPanel {
         log.setBorder(BorderFactory.createLineBorder(Color.gray, 2));
         add(log);
         
+        // create the buttons
         buttonsPanel = new JPanel();
         buttonsPanel.setBounds((int)(Boot.windowSize.width*0.5 - logWidth*2), 470, logWidth*4, 50);
         buttonsPanel.setLayout(new GridLayout(1, 3, 15, 5));
@@ -53,6 +59,9 @@ public class ResultsSceneUI extends JPanel {
         add(buttonsPanel);
 	}
 	
+	/*
+	 * Update the player list
+	 */
 	public void update() {
 		playerListModel.removeAllElements();
 		for(int i = 0; i < scene.archievedTanks.size(); i++) {
@@ -63,6 +72,9 @@ public class ResultsSceneUI extends JPanel {
 		log.repaint();
 	}
 	
+	/*
+	 * remove a player from the list
+	 */
 	public void removePlayer(int index) {
 		playerListModel.removeElementAt(index);
 		update();

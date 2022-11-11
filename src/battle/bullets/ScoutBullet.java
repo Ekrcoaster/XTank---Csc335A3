@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * Scout bullets are very strong but cannot travel far at all
+ */
 package battle.bullets;
 
 import java.awt.Color;
@@ -14,7 +18,7 @@ public class ScoutBullet extends Bullet {
 		super(scene, ownerID, x, y, direction);
 		this.damage = 7;
 		this.speed = 8;
-		this.maxDistance = 150;
+		this.maxDistance = 200;
 		this.collisionRadius = 5;
 	}
 
@@ -44,7 +48,6 @@ public class ScoutBullet extends Bullet {
 
 	@Override
 	public String getType() {
-		return "short";
+		return "scout";
 	}
-
 }

@@ -92,6 +92,9 @@ public class JoinScene extends Scene implements NetworkListener {
 		Server.server.sendMessageToAllBut("start battle " + mapName, myPlayerID);
 	}
 	
+	/*
+	 * This will enter the battle scene
+	 */
 	public void enterBattleScene(String map) {
 		// if my player ID is real, it is gonna be in the list of playerIDs, so remove it
 		
@@ -180,6 +183,12 @@ public class JoinScene extends Scene implements NetworkListener {
 			int index = playerIDs.indexOf(message.getArg(0));
 			playerTankTypes.set(index, message.getArg(1));
 			ui.updatePlayerName(index, message.getArg(1));
+		}
+		
+		// a map has been changed
+		if(message.is("map")) {
+			ui.setMap(message.getArg(0));
+			mapName = message.getArg(0);
 		}
 	}
 

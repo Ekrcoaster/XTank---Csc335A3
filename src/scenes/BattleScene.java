@@ -28,19 +28,20 @@ import ui.*;
 
 public class BattleScene extends Scene implements NetworkListener {
 
-	public HashMap<String, Tank> players;
-	public ArrayList<Bullet> bullets;
-	
 	public boolean isServer;
 	public BattleBoardUI ui;
 	public String playerID;
 	
-	public boolean exit;
+	public HashMap<String, Tank> players;
+	public ArrayList<Bullet> bullets;
+	public BattleMap map;
+	
+	public boolean threadExit;
 	Thread gameTickThread;
 	
-	public BattleMap map;
 	ArrayList<Renderable> itemsToRender;
 	
+	boolean gameOver;
 	Tank winnerTank;
 	int timeOnWinnerScreen;
 	
@@ -50,7 +51,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		this.itemsToRender = new ArrayList<Renderable>();
 		this.playerID = playerID;
 		this.isServer = isServer;
+		this.gameOver = false;
 		
+		// create the map
 		this.map = new BattleMap(mapName, Boot.windowSize.width - 15, Boot.windowSize.height - 40);
 		
 		// create the client's tank (if this instance is even a client)
@@ -63,24 +66,20 @@ public class BattleScene extends Scene implements NetworkListener {
 			players.put(otherPlayerIDs.get(i), newTank);
 		}
 		
-		// debug server stuff
-		if(isServer) {
-			System.out.println("-- All Players: --");
-			for(Tank tank : players.values()) {
-				System.out.println(tank);
-			}
-		}
 	}
 
+	/*
+	 * This is called on startup
+	 */
 	@Override
 	public void init() {
-		exit = false;
+		threadExit = false;
 		
 		// create the scenes board UI
 		ui = new BattleBoardUI(this);
 		WindowManager.setPanel(ui);
 		
-		// if we are the server (aka we are spectating)
+		// add the listeners
 		if(playerID == null) {
 			Server.server.addListener(this);
 			Server.server.acceptingNewPlayers = false;
@@ -93,16 +92,31 @@ public class BattleScene extends Scene implements NetworkListener {
 			addToRenderQueue(tank);
 		}
 		
+		// add the renderables from the map
 		for(Renderable item : map.getRenderables()) {
 			addToStartRenderQueue(item);
 		}
 		
 		startGameLoop();
+
+		// create some dummy tanks if the player is alone
+		if(players.size() == 1) {
+			ui.sendNotification("You are playing alone, so here are some dummy tanks to keep you company", Color.green, false);
+			createDummyTank("Dummy Tank 1", 100, 450, 2);
+			createDummyTank("Dummy Tank 2", 750, 350, 1);
+			createDummyTank("Dummy Tank 3", 400, 500, 0);
+		}
 	}
 	
+	/*
+	 * This will begin a game loop in a new thread
+	 */
 	private void startGameLoop() {
 		// create the _main scenes tick thread, this will call update/render based on the fps
 		gameTickThread = new Thread(() -> {
+			
+			// FPS MANAGER
+			// this will keep the game running at a steady fps
 			// get the last time, the fps tick ratio, and the delta
 			long lastTime = System.nanoTime();
 			double ratio = 1000000000.0 / (double)Boot.BATTLE_FPS;
@@ -113,9 +127,9 @@ public class BattleScene extends Scene implements NetworkListener {
 				placeTankAtRandomPosition(players.get(playerID));
 
 			// run as fast as humanly possible
-			while(!exit) {
+			while(!threadExit) {
 
-				// calcualte the delta (how much time has passed between every tick)
+				// Calculate the delta (how much time has passed between every tick)
 				long currentTime = System.nanoTime();
 				delta += (currentTime - lastTime) / ratio;
 				lastTime = currentTime;
@@ -124,7 +138,7 @@ public class BattleScene extends Scene implements NetworkListener {
 				// this COULD be an if statement, but using a while lets the scenes catchup incase it lags
 				while(delta >= 1) {
 					update();
-					render();
+					ui.render(itemsToRender);
 					delta--;
 				}
 			}
@@ -132,11 +146,15 @@ public class BattleScene extends Scene implements NetworkListener {
 		gameTickThread.start();
 	}
 
+	/*
+	 * The update method, this updates all tanks, handles movements, etc
+	 */
 	private void update() {
 		
 		// this is called once a tank has won the game, it spins the tank for a second, then goes to the results screen
-		if(winnerTank != null) {
-			winnerTank.setDirection(winnerTank.getDirection() + 5);
+		if(gameOver) {
+			if(winnerTank != null)
+				winnerTank.setDirection(winnerTank.getDirection() + 5);
 			timeOnWinnerScreen++;
 			
 			// time is up, swap the scene
@@ -182,16 +200,11 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 	}
 	
-	private void render() {
-		ui.render(itemsToRender);
-	}
-	
 	/*
 	 * Messages received by the server AND clients!
 	 */
 	@Override
 	public void onMessage(Message message) {
-		System.out.println(message);
 		if(isServer) {
 			if(message.fromID == null)
 				return;
@@ -251,6 +264,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		Server.server.sendMessageToAllBut(commandPrefix + " " + m.fromID + " " + m.joinedArgs(), m.fromID);
 	}
 	
+	/*
+	 * This is called for server updates to a tank's position!
+	 */
 	private void updateTankPos(String id, double x, double y) {
 		if(id.equals(playerID))
 			return;
@@ -261,6 +277,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 	}
 	
+	/*
+	 * This is called for server updates to a tank's direction
+	 */
 	private void updateTankDir(String id, double dir) {
 		if(id.equals(playerID))
 			return;
@@ -270,17 +289,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 	}
 	
-	public void placeTankAtRandomPosition(Tank tank) {
-		tank.setX((Math.random() * Boot.windowSize.getWidth() * 0.75)+  Boot.windowSize.getWidth() * 0.15);
-		tank.setY((Math.random() * Boot.windowSize.getHeight() * 0.75) +  Boot.windowSize.getHeight() * 0.15);
-		
-		// check for collisions
-		ColliderHitPoint point = tank.calculateCollisions();
-		tank.setX(point.x + tank.getSize());
-		tank.setY(point.y + tank.getSize());
-		tank.savePositionToServer();
-	}
-	
+	/*
+	 * This is called for a server's updates to a tank's health
+	 */
 	private void updateTankHealth(String id, double newHealth) {
 		Tank tank = players.get(id);
 		if(tank != null) {
@@ -290,10 +301,16 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 	}
 	
+	/*
+	 * This is called when damage has happened to a tank, update the notification at the bottom
+	 */
 	void updateTankDamageNotification(Tank tank) {
+		// good english
 		String name = tank.getName() + " was ";
 		if(tank.getID().equals(playerID))
 			name = "you were ";
+		
+		// the 2 notifications
 		if(tank.isDead()) {
 			ui.sendNotification(name + "killed! " + getTanksAlive().size() + " tanks remain!", Color.red, false);
 		} else {
@@ -301,26 +318,53 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 	}
 	
+	/*
+	 * This is called every time a player's health has changed, check to see if we should end the game
+	 */
 	void checkForEndOfGame() {
 		// figure out how many players alive and who is alive
 		ArrayList<Tank> tanks = getTanksAlive();
-		Tank alive = tanks.get(0);
+		Tank alive = tanks.size() == 0 ? null :tanks.get(0);
 		
-		// if there is only 0-1 tanks alive
+		// if there is only 0-1 tanks alive (0 should be impossible, but just incase)
 		if(tanks.size() <= 1) {
-			ui.sendNotification(alive.getName() + " won!", null, true);
-			winnerTank = alive;
-			alive.damageDealt += 25;
+			if(alive != null) {
+				ui.sendNotification(alive.getName() + " won!", null, true);
+				alive.damageDealt += 25;
+				winnerTank = null;
+			} else {
+				ui.sendNotification("Somehow, no one won!", null, true);
+			}
+			gameOver = true;
 		}
 	}
 	
+	/*
+	 * Called for server's update on tanks' damage
+	 */
 	private void updateTankBulletDamage(String id, double newBulletDamage) {
 		Tank tank = players.get(id);
 		if(tank != null) {
 			players.get(id).damageDealt = newBulletDamage;
 		}
 	}
+
+	/*
+	 * This will place a tank at a random position
+	 */
+	public void placeTankAtRandomPosition(Tank tank) {
+		double x = ((Math.random() * Boot.windowSize.getWidth() * 0.75)+  Boot.windowSize.getWidth() * 0.15);
+		double y =((Math.random() * Boot.windowSize.getHeight() * 0.75) +  Boot.windowSize.getHeight() * 0.15);
+		
+		// check for collisions
+		tank.setPosToCollisionCheck(x, y);
+		tank.savePositionToServer();
+	}
 	
+	/*
+	 * This will create a tank using the strigified type, this is useful to transfer and reconstruct the different
+	 * tank types over the server
+	 */
 	private Tank createTank(String playerID, String name, String type, boolean serverControlled) {
 		Tank tank;
 		
@@ -336,7 +380,22 @@ public class BattleScene extends Scene implements NetworkListener {
 		tank.setY(500);
 		return tank;
 	}
+
+	/*
+	 * This will create a dummy no AI tank for singleplayer
+	 */
+	void createDummyTank(String name, double x, double y, int index) {
+		String[] types = {"generic", "sturdy", "magic", "bomb", "scout"};
+		Tank a =createTank(name.toLowerCase().replace(" ", "_"), name, types[(int)Math.floor(Math.random() * types.length)], true);
+		a.setPosToCollisionCheck(x, y);
+		a.damageDealt = index;
+		players.put(name.toLowerCase().replace(" ", "_"), a);
+		addToRenderQueue(a);
+	}
 	
+	/*
+	 * This will create a bullet using the stringified type, helpful for server sync
+	 */
 	private Bullet createBullet(String playerID, String bulletType, double x, double y, double direction) {
 		Bullet bullet;
 		switch(bulletType) {
@@ -351,6 +410,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		return bullet;
 	}
 	
+	/*
+	 * This will destroy a bullet
+	 */
 	public void destroyBullet(Bullet bullet) {
 		bullets.remove(bullet);
 		removeFromRenderQueue(bullet);
@@ -368,14 +430,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		itemsToRender.remove(item);
 	}
 	
-	String generateDataForResults() {
-		String text = "results ";
-		for(Tank tank : players.values()) {
-			text += tank.toEncoded() + " ";
-		}
-		return text;
-	}
-	
+	/*
+	 * This will find the tank that collides with x/y/radius, if one exists
+	 */
 	public Tank getCollidedTank(double x, double y, double radius) {
 		for(Tank tank : players.values()) {
 			ColliderRect rect = tank.getColliderRect(3 + (int)radius);
@@ -385,6 +442,9 @@ public class BattleScene extends Scene implements NetworkListener {
 		return null;
 	}
 	
+	/*
+	 * Get the tanks alive
+	 */
 	public ArrayList<Tank> getTanksAlive() {
 		ArrayList<Tank> tanks = new ArrayList<Tank>();
 		for(Tank tank : players.values()) {
@@ -394,9 +454,20 @@ public class BattleScene extends Scene implements NetworkListener {
 		return tanks;
 	}
 	
+	/*
+	 * This will return the results to the results screen
+	 */
+	String generateDataForResults() {
+		String text = "results ";
+		for(Tank tank : players.values()) {
+			text += tank.toEncoded() + " ";
+		}
+		return text;
+	}
+	
 	@Override
 	public void exit() {
-		exit = true;
+		threadExit = true;
 	}
 
 	@Override

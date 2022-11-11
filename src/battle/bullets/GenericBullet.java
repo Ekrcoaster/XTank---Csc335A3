@@ -26,9 +26,6 @@ public class GenericBullet extends Bullet {
 	}
 
 	@Override
-	public String getType() { return "generic"; }
-
-	@Override
 	public void onMapCollision(ColliderHitPoint point) {
 		destroy();
 	}
@@ -37,4 +34,8 @@ public class GenericBullet extends Bullet {
 	public void onTankCollision(Tank tank) {
 		destroy();
 	}
+	
+	@Override
+	public String getType() { return "generic"; }
+
 }

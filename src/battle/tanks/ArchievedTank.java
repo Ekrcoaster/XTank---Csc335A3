@@ -1,3 +1,8 @@
+/*
+ * Author: Ethan Rees
+ * This tank represents a past tank from the game, it holds simple information and is used to sort things
+ * on the results screen
+ */
 package battle.tanks;
 
 public class ArchievedTank implements Comparable<ArchievedTank> {
@@ -10,7 +15,7 @@ public class ArchievedTank implements Comparable<ArchievedTank> {
 		this.id = id;
 		this.name = name;
 		this.type = type;
-		this.damageDealt = damageDealt;
+		this.damageDealt = Math.round(damageDealt*100)/(double)100;
 	}
 	
 	@Override

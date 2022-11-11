@@ -13,38 +13,15 @@ import network.Message;
 public class SceneManager {
 	public static Scene activeScene;
 	
+	/* Change the active scene to this*/
 	public static void setScene(Scene scene) {
 		if(activeScene != null) activeScene.exit();
 		activeScene = scene;
-		
 		scene.init();
 	}
 	
 	public static void main(String[] args) throws Exception {
-		ResultsScene scen = new ResultsScene(Boot.defaultMapType, "test");
-		setScene(scen);
-		scen.onMessage(new Message("results 000 Bob 0.0 magic sdsdsd Adele 0.0 scout 8ux2u1my you! 45.0 magic afcfs Taylor_Swift 0.0 bomb", null));
-		/*
 		new Client(true, Boot.defaultServerAdress, Boot.defaultPort, "me");
-		ArrayList<String> tempPlayerIDS = new ArrayList<String>();
-		ArrayList<String> tempPlayerNames = new ArrayList<String>();
-		ArrayList<String> tempPlayerTypes = new ArrayList<String>();
-		tempPlayerIDS.add("000");
-		tempPlayerNames.add("Bob");
-		tempPlayerTypes.add("magic");
-		
-		tempPlayerIDS.add("afcfs");
-		tempPlayerNames.add("Taylor Swift");
-		tempPlayerTypes.add("bomb");
-		
-		tempPlayerIDS.add("sdsdsd");
-		tempPlayerNames.add("Adele");
-		tempPlayerTypes.add("scout");
-		BattleScene scene = new BattleScene(Client.client.id, "you!", "magic", tempPlayerIDS, tempPlayerNames, tempPlayerTypes, true, Boot.defaultMapType);
-		setScene(scene);
-		// place the tanks at random spots
-		scene.onMessage(new Message("sPos 500 500", "000"));
-		scene.onMessage(new Message("sPos 300 400", "afcfs"));
-		scene.onMessage(new Message("sPos 100 200", "sdsdsd"));*/
+		setScene(new BattleScene(Client.client.id, "you!", "magic", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), true, "empty"));
 	}
 }

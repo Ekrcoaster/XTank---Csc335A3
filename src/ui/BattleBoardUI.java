@@ -53,16 +53,17 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		this.framesSinceShownBulletCooldown = 0;
 		this.notificationColor = Color.white;
 		this.largeNotification = false;
+		
 		setLayout(new BorderLayout(0, 0));
-		
 		setFocusable(true);
-		
 		requestFocusInWindow();
 		requestFocus();
-
 		addKeyListener(this);
 	}
 
+	/*
+	 * take in all of the renderables, store them, then tell the jframe to repaint
+	 */
 	public void render(ArrayList<Renderable> renderQueue) {
 		this.renderQueue = renderQueue;
 		if(!isFocusOwner()) {
@@ -72,14 +73,10 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		
 		repaint();
 	}
-	
-	public void sendNotification(String notification, Color color, boolean large) {
-		this.notification = notification;
-		this.frame = 25;
-		this.notificationColor = color;
-		this.largeNotification = large;
-	}
-	
+
+	/*
+	 * The repaint call
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		// draw backdrop
@@ -90,8 +87,17 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		for(Renderable item : renderQueue) {
 			item.render(g);
 		}
-		
-		// draw the leaderboard
+
+		renderUI(g);
+	}
+	
+	/*
+	 * This will render the game's UI
+	 */
+	void renderUI(Graphics g) {
+		// - - - - - - - - -
+		// THE LEADERBOARD
+		// - - - - - - - - -
 		
 		// calculate the longest width and add the tanks to the list
 		int longestWidth = 0;
@@ -116,7 +122,10 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 			g.drawString(drawLeaderboardLine(i, tank), 10, i * 18 + 20);
 		}
 		
-		// draw the large notification
+		
+		// - - - - - - - - -
+		//   NOTIFICATIONS
+		// - - - - - - - - -
 		if(largeNotification) {
 			Font font = new Font("Arial", Font.BOLD, 64);
 			int width = getFontMetrics(font).stringWidth(notification);
@@ -138,9 +147,11 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 			g.drawString(notification, (int)(Boot.windowSize.width * 0.47 - width * 0.5), (int)(Boot.windowSize.height - 50));
 		}
 		
-		
-		// draw the bullet cooldown
-		if(scene.playerID != null) {
+
+		// - - - - - - - - -
+		//  BULLET COOLDOWN
+		// - - - - - - - - -
+		if(scene.playerID != null && !largeNotification) {
 			Tank clientTank = scene.players.get(scene.playerID);
 			
 			// if the tank is on cooldown OR it is fading out
@@ -163,35 +174,42 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		if(framesSinceShownBulletCooldown > 0)
 			framesSinceShownBulletCooldown--;
 	}
-	
+
+	/*
+	 * create the leaderboard line given a tank
+	 */
 	String drawLeaderboardLine(int i, Tank tank) {
-		return (i+1) + ") " + tank.getName() + ": " + tank.damageDealt + (tank.isDead() ? " (dead)" : "");
+		return (i+1) + ") " + tank.getName() + ": " + Math.round(100*tank.damageDealt)/(double)100 + (tank.isDead() ? " (dead)" : "");
 	}
 	
+	/*
+	 * Send a notification to the screen
+	 */
+	public void sendNotification(String notification, Color color, boolean large) {
+		this.notification = notification;
+		this.frame = 25;
+		this.notificationColor = color;
+		this.largeNotification = large;
+	}
+	
+	/*
+	 * Handle key events:
+	 */
 	public HashSet<Integer> getKeysDown() {
 		return this.keysDown;
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {}
-
-	@Override
 	public void keyPressed(KeyEvent e) {
 		keysDown.add(e.getKeyCode());
-		if(e.getKeyChar() == 'e') {
-			for(Renderable item : scene.map.getRenderables()) {
-				scene.removeFromRenderQueue(item);
-			}
-			scene.map = new BattleMap(scene.map.getMapName(), scene.map.getMapWidth(), scene.map.getMapHeight());
-
-			for(Renderable item : scene.map.getRenderables()) {
-				scene.addToStartRenderQueue(item);
-			}
-		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		keysDown.remove(e.getKeyCode());
 	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {}
+
 }

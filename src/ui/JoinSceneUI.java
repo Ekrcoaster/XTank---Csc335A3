@@ -39,6 +39,8 @@ public class JoinSceneUI extends JPanel {
 	DropdownField mapChooser;
 	ArrayList<TankTypePreviewUI> types;
 	
+	JLabel playerListTitle;
+	
 	boolean server;
 	
 	int selectedTankType;
@@ -74,9 +76,12 @@ public class JoinSceneUI extends JPanel {
 		
 		setLayout(null);
 		createJoinListPanel(mapName, server && !client ? 120 : 0);
-		if(client)
-			createTankOptionsPanel();
 		
+		if(client) {
+			createTankOptionsPanel();
+		}
+		
+		// if we are the server, allow the user to change the map if they would like
 		if(server) {
 			// get all of the maps from the directory
 			File directory = new File("./maps");
@@ -88,34 +93,56 @@ public class JoinSceneUI extends JPanel {
 				names[i] = files[i].getName().replace(".txt", "");
 			}
 			
-			//mapChooser = new DropdownField("Choose your Map:", Boot.defaultMapType, names, 100, 70, 20);
-			//mapChooser.setBounds(0, 0, 100, 100);
-			//add(mapChooser);
+			mapChooser = new DropdownField("Edit Your Map:", mapName, names, 100, 70, 20);
+			mapChooser.setBounds(client ? 50 : 170, 30, 300, 100);
+			mapChooser.addChangeListener(l -> {
+				Server.server.sendMessage("map " + mapChooser.getValue());
+				setMap(mapChooser.getValue());
+				scene.mapName = mapChooser.getValue();
+			});
+			joinListPanel.add(mapChooser);
 		}
 		
 		update();
         
 	}
 	
+	/*
+	 * This will set the new map on the UI
+	 */
+	public void setMap(String mapName) {
+		if(this.mapChooser != null)
+			this.mapChooser.setValue(mapName);
+		playerListTitle.setText("Connected Players: (playing map \"" + mapName + "\")");
+	}
+	
+	/*
+	 * This will creat the server join list panel
+	 */
 	void createJoinListPanel(String mapName, int xOffset) {
+		// create the panel
 		joinListPanel = new JPanel();
 		joinListPanel.setLayout(null);
 		int width = (int)(Boot.windowSize.width*0.5);
 		joinListPanel.setBounds(xOffset, 0, width + xOffset, Boot.windowSize.height);
 		
-		JLabel playerLabel = new JLabel("Connected Players: (playing map \"" + mapName + "\")");
-        playerLabel.setBounds(50 + xOffset, 80, width, 20);
-        joinListPanel.add(playerLabel);
+		// add the player list
+		playerListTitle = new JLabel("Connected Players: (playing map \"" + mapName + "\")");
+		playerListTitle.setBounds(50 + xOffset, 80, width, 20);
+        joinListPanel.add(playerListTitle);
         
 		playerListModel = new DefaultListModel<String>();
         JList log = new JList<String>(playerListModel);
         
+        
+        // add the scroll functionality
         int scrollWidth = 275;
         scroll = new JScrollPane(log);
         scroll.setWheelScrollingEnabled(true);
         scroll.setBounds(50 + xOffset, 100, 50 + scrollWidth, Boot.windowSize.height - 300);
         joinListPanel.add(scroll);
         
+        // add the server only info
         if(Server.server != null) {
             JLabel serverIP = new JLabel("Join using the Server IP: " + Boot.getIPAddress());
             serverIP.setBounds(50 + xOffset + xOffset, Boot.windowSize.height - 200, width + xOffset, 20);
@@ -126,6 +153,7 @@ public class JoinSceneUI extends JPanel {
             add(serverPort);
         }
         
+        // add the begin game button
         int buttonWidth = 200;
         beginGameButton = new JButton(server ? "Begin Game" : "Waiting for server to begin...");
         beginGameButton.setBounds((int)(width*0.5 - buttonWidth * 0.5) + xOffset, Boot.windowSize.height - 150, buttonWidth, 60);
@@ -138,23 +166,29 @@ public class JoinSceneUI extends JPanel {
 		add(joinListPanel);
 	}
 	
+	/*
+	 * Create the tank choser panel
+	 */
 	void createTankOptionsPanel() {
+		// setup the panel
 		int width = (int)(Boot.windowSize.width*0.5);
 		tankSelectorPanel = new JPanel();
 		tankSelectorPanel.setLayout(null);
 		tankSelectorPanel.setBounds(width, 0, width, Boot.windowSize.height);
 
+		// add the label
 		int xOffset = (int)(width * 0.115); 
 		JLabel label = new JLabel("Choose your Tank:");
 		label.setBounds(xOffset, 10, width, 32);
 		tankSelectorPanel.add(label);
 		
-		
-		
+		// draw the different tank types out
 		for(int i = 0; i < tankNames.length; i++) {
 			TankTypePreviewUI ui = new TankTypePreviewUI(tankNames[i], tankDescriptions[i], tankInstances[i], xOffset, i * 100 + 40, (int)(width * 0.75), 90);
 			types.add(ui);
 			final int index = i;
+			
+			// handle mouse events
 			ui.addMouseListener(new MouseListener() {
 				@Override
 				public void mousePressed(MouseEvent e) {
@@ -175,21 +209,34 @@ public class JoinSceneUI extends JPanel {
 		add(tankSelectorPanel);
 	}
 	
+	/*
+	 * This will update the UI
+	 */
 	public void update() {
 		for(int i = 0; i < types.size(); i++)
 			types.get(i).setSelected(i == selectedTankType);
 	}
 	
+	/*
+	 * Remove all player names from the list
+	 */
 	public void clearPlayerNames() {
 		playerListModel.removeAllElements();
 	}
 
+	/*
+	 * Add player name to the list
+	 */
 	public void addPlayerName(String name) {
 		playerListModel.addElement(name.replace("_", " ") + "   (the " + Boot.defaultTankType + " tank)");
 		beginGameButton.setEnabled(server && playerListModel.size() > 0);
 	}
 	
+	/*
+	 * Update player name to the list
+	 */
 	public void updatePlayerName(int changeIndex, String type) {
 		playerListModel.setElementAt(scene.playerNames.get(changeIndex).replace("_", " ") + "   (the " + type + " tank)", changeIndex);
 	}
+
 }

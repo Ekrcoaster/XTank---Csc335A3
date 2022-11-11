@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * The sturdy tank is a big tank that has a lot of health but not a lot of damamge
+ */
 package battle.tanks;
 
 import java.awt.Color;

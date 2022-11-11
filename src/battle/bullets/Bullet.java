@@ -13,7 +13,6 @@ import scenes.BattleScene;
 import ui.Renderable;
 
 public abstract class Bullet implements Renderable {
-	BattleScene scene;
 	public String ownerID;
 	public double direction;
 	public double speed;
@@ -23,6 +22,7 @@ public abstract class Bullet implements Renderable {
 	
 	protected double distanceTravelled;
 	double cachedSin, cachedCos;
+	BattleScene scene;
 	
 	public Bullet(BattleScene scene, String ownerID, double x, double y, double direction) {
 		this.scene = scene;
@@ -35,7 +35,44 @@ public abstract class Bullet implements Renderable {
 		this.distanceTravelled = 0;
 		setDirection(direction);
 	}
+
+	/*
+	 * This gets called every frame
+	 */
+	public void update() {
+		updateMovement();
+		updateCollisions();
+	}
 	
+	/*
+	 * This gets called every time collisions should be updated
+	 */
+	protected void updateCollisions() {
+		// calculate collisions for the map
+		ColliderHitPoint point = scene.map.calculateCollisions(x, y, 0, 0);
+		if(point.hit)
+			onMapCollision(point);
+	}
+	
+	/*
+	 * This gets called everytime movement should be updated
+	 */
+	protected void updateMovement() {
+		x += cachedSin * speed;
+		y -= cachedCos * speed;
+		distanceTravelled += speed;
+	}
+
+	/*
+	 * a method to destroy this bullet
+	 */
+	protected void destroy() {
+		scene.destroyBullet(this);
+	}
+
+	/*
+	 * When given a direction, set it, but also cache the sine and cosine for optimization!
+	 */
 	public void setDirection(double direction) {
 		cachedSin = Math.sin(Math.toRadians(direction));
 		cachedCos = Math.cos(Math.toRadians(direction));
@@ -43,29 +80,7 @@ public abstract class Bullet implements Renderable {
 		this.direction = direction;
 	}
 	
-	protected void updateCollisions() {
-		// calculate collisions for the map
-		ColliderHitPoint point = scene.map.calculateCollisions(x, y, 0, 0);
-		if(point.hit)
-			onMapCollision(point);
-		
-	}
-	
-	protected void updateMovement() {
-		x += cachedSin * speed;
-		y -= cachedCos * speed;
-		distanceTravelled += speed;
-	}
-	
-	public void update() {
-		updateMovement();
-		updateCollisions();
-	}
-	
-	protected void destroy() {
-		scene.destroyBullet(this);
-	}
-	
+	// abstract methods
 	public abstract void render(Graphics g);
 	public abstract void onMapCollision(ColliderHitPoint point);
 	public abstract void onTankCollision(Tank tank);

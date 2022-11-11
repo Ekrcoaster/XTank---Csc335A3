@@ -13,7 +13,8 @@ public abstract class NetworkActivityCaller {
 	public void addListener(NetworkListener listener) {
 		if(listeners == null)
 			listeners = new ArrayList<NetworkListener>();
-		listeners.add(listener);
+		if(!listeners.contains(listener))
+			listeners.add(listener);
 	}
 	
 	// remove the listener from the list

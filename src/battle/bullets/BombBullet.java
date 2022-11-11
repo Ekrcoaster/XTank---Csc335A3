@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * A bomb bullet is a type of bullet that moves slowly but does a ton of damage!
+ */
 package battle.bullets;
 
 import java.awt.Color;
@@ -9,6 +13,7 @@ import scenes.BattleScene;
 
 public class BombBullet extends Bullet {
 
+	// frame is used for the blinking animation
 	int frame;
 	public BombBullet(BattleScene scene, String ownerID, double x, double y, double direction) {
 		super(scene, ownerID, x-10, y-10, direction);
@@ -32,9 +37,6 @@ public class BombBullet extends Bullet {
 	}
 
 	@Override
-	public String getType() { return "bomb"; }
-
-	@Override
 	public void onMapCollision(ColliderHitPoint point) {
 		destroy();
 	}
@@ -46,4 +48,8 @@ public class BombBullet extends Bullet {
 			this.damage = 20;
 		destroy();
 	}
+
+	@Override
+	public String getType() { return "bomb"; }
+
 }

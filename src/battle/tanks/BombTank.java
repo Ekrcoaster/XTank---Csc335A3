@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * The bomb tank is a big tank whos movement speed depends on the bomb cooldown
+ */
 package battle.tanks;
 
 import java.awt.Color;
@@ -19,20 +23,15 @@ public class BombTank extends Tank {
 		this.size = 23;
 	}
 	
-	@Override public void update() {
+	@Override 
+	public void update() {
 		super.update();
-
 		this.moveSpeed = 1.5 + (bulletActiveCooldown / bulletSpeedCooldown)*4;
 	}
 
 	@Override
 	public Bullet shoot(IntPoint origin, double direction) {
 		return new BombBullet(scene, id, origin.x, origin.y, direction);
-	}
-
-	@Override
-	public String getType() {
-		return "bomb";
 	}
 
 	@Override
@@ -43,5 +42,10 @@ public class BombTank extends Tank {
 		
 		g.setColor(color);
 		g.drawOval((int)(x-size), (int)(y-size), (int)size*2, (int)size*2);
+	}
+
+	@Override
+	public String getType() {
+		return "bomb";
 	}
 }

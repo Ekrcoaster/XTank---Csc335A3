@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * Almost a near copy of generic bullets, but a bit stronger
+ */
 package battle.bullets;
 
 import java.awt.Color;
@@ -23,9 +27,6 @@ public class SturdyBullet extends Bullet {
 	}
 
 	@Override
-	public String getType() { return "sturdy"; }
-
-	@Override
 	public void onMapCollision(ColliderHitPoint point) {
 		destroy();
 	}
@@ -34,4 +35,7 @@ public class SturdyBullet extends Bullet {
 	public void onTankCollision(Tank tank) {
 		destroy();
 	}
+	
+	@Override
+	public String getType() { return "sturdy"; }
 }

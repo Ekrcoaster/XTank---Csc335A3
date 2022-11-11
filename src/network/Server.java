@@ -184,11 +184,4 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 	public int getPort() {
 		return port;
 	}
-
-	/*
-	 * This class can be run alone, in which it'll create the network and start it
-	 */
-	public static void main(String[] args) throws IOException {
-		new Server(Boot.defaultPort);
-	}
 }

@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * This is the results scene, it holds the results and provides ways to restart the game, exit, or leave the game
+ */
 package scenes;
 
 import java.util.ArrayList;
@@ -38,9 +42,9 @@ public class ResultsScene extends Scene implements NetworkListener {
 
 	@Override
 	public void onMessage(Message message) {
+		// once the results have arrived, create the archived tanks
 		if(message.is("results")) {
 			for(int i = 0; i < message.args.size(); i += 4) {
-				System.out.println(i + " " + message.getArg(i));
 				archievedTanks.add(new ArchievedTank(
 					message.getArg(i),
 					message.getArg(i+1),
@@ -53,6 +57,7 @@ public class ResultsScene extends Scene implements NetworkListener {
 			ui.update();
 		}
 		
+		// if a client has exited, remove them from the list
 		if(message.is("clientExit") || message.is("aClientExited")) {
 			String clientID = message.fromID == null ? message.getArg(0) : message.fromID;
 			int index = -1;
@@ -67,10 +72,16 @@ public class ResultsScene extends Scene implements NetworkListener {
 			}
 		}
 		
+		// if the command is "start join", return back to the join scene
 		if(message.is("start") && message.getArg(0).equals("join"))
 			SceneManager.setScene(new JoinScene(Client.client != null, Server.server != null, playerName, mapName));
 	}
 	
+	/*
+	 * Request to leave the game
+	 * Server: kick out all clients
+	 * Client: just leave and inform the server
+	 */
 	void requestLeave() {
 		if(Server.server != null) {
 			Server.server.close();
@@ -80,16 +91,25 @@ public class ResultsScene extends Scene implements NetworkListener {
 		}
 	}
 	
+	/*
+	 * Return to the join scene and tell the clients to do the same
+	 */
 	public void playAgain() {
 		SceneManager.setScene(new JoinScene(Client.client != null, Server.server != null, Client.client == null ? null : Client.client.getName(), mapName));
 		Server.server.sendMessage("start join");
 	}
 	
+	/*
+	 * leave the game and return to title
+	 */
 	public void toTitle() {
 		requestLeave();
 		SceneManager.setScene(new TitleScene());
 	}
 	
+	/*
+	 * leave the game and exit
+	 */
 	public void exitGame() {
 		requestLeave();
 		System.exit(0);
@@ -99,5 +119,4 @@ public class ResultsScene extends Scene implements NetworkListener {
 	public void onSentMessage(Message message) { }
 	@Override
 	public void exit() { }
-
 }

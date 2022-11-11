@@ -18,7 +18,11 @@ public class WindowManager {
 	public static JFrame frame;
 	public static JPanel active;
 	
+	/*
+	 * Set the active panel
+	 */
 	public static JPanel setPanel(JPanel panel) {
+		// if the frame doesn't exist yet, create it
 		if(frame == null) {
 			frame = new JFrame();
 			
@@ -27,11 +31,12 @@ public class WindowManager {
 			frame.setPreferredSize(Boot.windowSize);
 			frame.setVisible(true);
 			frame.setResizable(false);
-			frame.setTitle("Csc 335 - X Tank Game (Ethan Rees)");
+			frame.setTitle("Csc 335 - XTank Game (Ethan Rees)");
 	        
 			frame.setLayout(new BorderLayout());
 		}
 		
+		// otherwise replace the contents
 		frame.getContentPane().removeAll();
 		active = panel;
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
@@ -41,6 +46,9 @@ public class WindowManager {
 		return panel;
 	}
 	
+	/*
+	 * Close the window
+	 */
 	public static void closeWindow() {
 		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 	}

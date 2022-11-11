@@ -147,10 +147,4 @@ public class Client extends NetworkActivityCaller implements MessageNode {
         exit = false;
         Client.client = null;
     }
-
-    // runs the client
-    public static void main(String[] args) throws Exception 
-    {
-    	new Client(Boot.clientCreatesServer, Boot.defaultServerAdress, Boot.defaultPort, "Testing");
-    }
 }

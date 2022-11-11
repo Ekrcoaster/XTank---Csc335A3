@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * The scout tank is an almost invisible tank that will shoot tiny but powerful bullets
+ */
 package battle.tanks;
 
 import java.awt.Color;

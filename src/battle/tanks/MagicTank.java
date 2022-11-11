@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * This tank is the magic tank, it shoots tiny magical bullets that track enemies down
+ */
 package battle.tanks;
 
 import java.awt.Color;
@@ -24,23 +28,26 @@ public class MagicTank extends Tank {
 	}
 
 	@Override
-	public String getType() {
-		return "magic";
-	}
-	
-	@Override
 	protected void drawTankBody(Graphics g, Color color) {
 		g.setColor(color);
+		// render the first triangle
 		drawRotatedPoly(new double[][] {
 			{-size, -size},
 			{size, -size},
 			{0, size},
 		}, direction, g);
 
+		// then the 2nd triangle
 		drawRotatedPoly(new double[][] {
 			{-size, size},
 			{size, size},
 			{0, 0},
 		}, direction, g);
 	}
+
+	@Override
+	public String getType() {
+		return "magic";
+	}
+	
 }

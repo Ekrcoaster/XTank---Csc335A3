@@ -43,6 +43,9 @@ public class BattleMap {
 		readMap(mapName);
 	}
 	
+	/*
+	 * Read in the map from a file, it goes line by line and builds the colliders
+	 */
 	private void readMap(String mapName) {
 		Scanner scanner;
 		try {
@@ -70,6 +73,9 @@ public class BattleMap {
 		scanner.close();
 	}
 	
+	/*
+	 * This interprets 1 line from the map file and turns it into a collider
+	 */
 	private void readMapInterpretLine(String[] pieces) {
 		double x = Double.parseDouble(pieces[1]);
 		double y = Double.parseDouble(pieces[2]);
@@ -92,6 +98,17 @@ public class BattleMap {
 		renderableColliders.add(rect);
 	}
 
+	/*
+	 * When given an x,y,width,height, calculate the collisons on that w the colliders
+	 */
+	public ColliderHitPoint calculateCollisions(double x, double y, double width, double height) {
+		ColliderHitPoint point = new ColliderHitPoint(x, y);
+		for(ColliderRect rect : colliders) {
+			point = rect.snapToEdgePoint(point, width, height);
+		}
+		return point;
+	}
+
 	public String getMapName() {
 		return mapName;
 	}
@@ -112,11 +129,4 @@ public class BattleMap {
 		return renderableColliders;
 	}
 	
-	public ColliderHitPoint calculateCollisions(double x, double y, double width, double height) {
-		ColliderHitPoint point = new ColliderHitPoint(x, y);
-		for(ColliderRect rect : colliders) {
-			point = rect.snapToEdgePoint(point, width, height);
-		}
-		return point;
-	}
 }

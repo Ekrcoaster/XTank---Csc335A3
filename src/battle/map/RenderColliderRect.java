@@ -19,17 +19,23 @@ public class RenderColliderRect extends ColliderRect implements Renderable {
 		this.time = 0;
 	}
 
+	/*
+	 * Render the collider
+	 */
 	public void render(Graphics g) {
 		time += 1;
 		
-		double offset = (Math.sin(time * 0.3 + x1) * 4) - 2;
+		// draw the main shape
 		g.setColor(color);
 		g.drawRect((int)Math.round(x1), (int)Math.round(y1), (int)Math.round(x2-x1), (int)Math.round(y2-y1));
 
+		// dim it and draw the shape slightly smaller
 		g.setColor(dimColor(color, 0.6));
 		int buffer = 5;
 		g.drawRect((int)Math.round(x1)+5, (int)Math.round(y1)+5, (int)Math.round(x2-x1)-buffer*2, (int)Math.round(y2-y1)-buffer*2);
-		
+
+		// finally, draw the squigly lines that are inside the shape
+		double offset = (Math.sin(time * 0.3 + x1) * 4) - 2;
 		for(double y = y1+buffer; y < y2 - 20; y += 20) {
 
 			g.setColor(dimColor(color, 0.3));

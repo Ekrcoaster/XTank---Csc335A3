@@ -1,3 +1,7 @@
+/*
+ * Author: Ethan Rees
+ * This interface represents a renderable, it allows for easy rendering
+ */
 package ui;
 
 import java.awt.Color;

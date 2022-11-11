@@ -25,6 +25,8 @@ public class TitleScene extends Scene {
 	public void exit() {}
 	
 	public void beginGame(boolean client, boolean server, String address, int port, String name, String mapName) {
+		if(!equals(SceneManager.activeScene))
+			return;
 		// if the player wants a client, create the client
 		if(client) {
 			try {
@@ -32,7 +34,7 @@ public class TitleScene extends Scene {
 				// is passed into the client so the client knows to create the server if needed
 				// notice their name has spaces replaced with underscores, this packs it as 1 word
 				// so sending the name through messages wont get confusing
-				Client c = new Client(server, address, port, name.replace(" ", "_"));
+				new Client(server, address, port, name.replace(" ", "_"));
 				
 				// finally, swap the scenes to the join scene
 				SceneManager.setScene(new JoinScene(client, server, name, mapName));
