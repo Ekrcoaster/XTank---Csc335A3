@@ -166,8 +166,7 @@ public class BattleScene extends Scene implements NetworkListener {
 			Tank collidedWith = getCollidedTank(bullet.x, bullet.y, bullet.collisionRadius);
 			
 			// if so, tell the tank, then calculate the damage
-			// && !collidedWith.getID().equals(bullet.ownerID)
-			if(collidedWith != null) {
+			if(collidedWith != null && !collidedWith.getID().equals(bullet.ownerID)) {
 				bullet.onTankCollision(collidedWith);
 				
 				// if we are the server, send it out to the client
