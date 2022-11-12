@@ -187,6 +187,7 @@ public abstract class Tank implements Renderable, Comparable<Tank> {
 	 */
 	public void kill() {
 		isDead = true;
+		scene.onTankKilled(this);
 	}
 	
 	

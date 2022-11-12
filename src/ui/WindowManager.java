@@ -6,7 +6,9 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
@@ -17,6 +19,7 @@ import _main.Boot;
 public class WindowManager {
 	public static JFrame frame;
 	public static JPanel active;
+	static Container container;
 	
 	/*
 	 * Set the active panel
@@ -34,12 +37,22 @@ public class WindowManager {
 			frame.setTitle("Csc 335 - XTank Game (Ethan Rees)");
 	        
 			frame.setLayout(new BorderLayout());
+			
+			container = frame.getContentPane();
+			
+			frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent event) {
+					Boot.closeAllNetworks();
+				}
+			});
 		}
 		
 		// otherwise replace the contents
-		frame.getContentPane().removeAll();
+		container.removeAll();
+		container.repaint();
 		active = panel;
-		frame.getContentPane().add(panel, BorderLayout.CENTER);
+		container.add(panel, BorderLayout.CENTER);
 		
 		frame.pack();
 		

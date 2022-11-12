@@ -102,10 +102,13 @@ public class BattleScene extends Scene implements NetworkListener {
 		// create some dummy tanks if the player is alone
 		if(players.size() == 1) {
 			ui.sendNotification("You are playing alone, so here are some dummy tanks to keep you company", Color.green, false);
-			createDummyTank("Dummy Tank 1", 100, 450, 2);
-			createDummyTank("Dummy Tank 2", 750, 350, 1);
-			createDummyTank("Dummy Tank 3", 400, 500, 0);
+			createDummyTank("Dummy Tank 1", "magic", 100, 450, 2);
+			createDummyTank("Dummy Tank 2", "sturdy", 750, 350, 1);
+			createDummyTank("Dummy Tank 3", "generic", 400, 500, 0);
 		}
+		
+		if(playerID == null)
+			ui.sendNotification("You are the server spectating!", Color.orange, false);
 	}
 	
 	/*
@@ -159,10 +162,14 @@ public class BattleScene extends Scene implements NetworkListener {
 			
 			// time is up, swap the scene
 			if(timeOnWinnerScreen > 130) {
-				SceneManager.setScene(new ResultsScene(map.getMapName(), players.get(playerID).getName()));
+				ResultsScene scene = new ResultsScene(map.getMapName(), playerID == null ? null : players.get(playerID).getName());
+				SceneManager.setScene(scene);
 				if(isServer) {
 					Server.server.sendMessage("start results");
-					Server.server.sendMessage(generateDataForResults());
+					String results = generateDataForResults();
+					Server.server.sendMessage("results " + results);
+					if(playerID == null)
+						scene.processResults(results);
 				}
 			}
 			return;
@@ -339,6 +346,11 @@ public class BattleScene extends Scene implements NetworkListener {
 		}
 	}
 	
+	public void onTankKilled(Tank tank) {
+		removeFromRenderQueue(tank);
+		addToStartRenderQueue(tank);
+	}
+	
 	/*
 	 * Called for server's update on tanks' damage
 	 */
@@ -384,9 +396,8 @@ public class BattleScene extends Scene implements NetworkListener {
 	/*
 	 * This will create a dummy no AI tank for singleplayer
 	 */
-	void createDummyTank(String name, double x, double y, int index) {
-		String[] types = {"generic", "sturdy", "magic", "bomb", "scout"};
-		Tank a =createTank(name.toLowerCase().replace(" ", "_"), name, types[(int)Math.floor(Math.random() * types.length)], true);
+	void createDummyTank(String name, String type, double x, double y, int index) {
+		Tank a =createTank(name.toLowerCase().replace(" ", "_"), name, type, true);
 		a.setPosToCollisionCheck(x, y);
 		a.damageDealt = index;
 		players.put(name.toLowerCase().replace(" ", "_"), a);
@@ -425,7 +436,7 @@ public class BattleScene extends Scene implements NetworkListener {
 	public void addToStartRenderQueue(Renderable item) {
 		itemsToRender.add(0, item);
 	}
-	
+
 	public void removeFromRenderQueue(Renderable item) {
 		itemsToRender.remove(item);
 	}
@@ -458,7 +469,7 @@ public class BattleScene extends Scene implements NetworkListener {
 	 * This will return the results to the results screen
 	 */
 	String generateDataForResults() {
-		String text = "results ";
+		String text = "";
 		for(Tank tank : players.values()) {
 			text += tank.toEncoded() + " ";
 		}

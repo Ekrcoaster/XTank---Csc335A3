@@ -10,7 +10,7 @@ public abstract class Scene {
 	public abstract void exit();
 	public abstract String getID();
 	
-	@Override
+	/*@Override
 	public boolean equals(Object o) {
 		if(o == null)
 			return false;
@@ -18,5 +18,5 @@ public abstract class Scene {
 			return ((Scene)o).getID().equals(getID());
 		}
 		return false;
-	}
+	}*/
 }

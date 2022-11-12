@@ -14,7 +14,7 @@ public class GenericTank extends Tank {
 		super(id, name, isServerControlled, scene);
 		this.health = 10;
 		this.moveSpeed = 5;
-		this.rotateSpeed = 3;
+		this.rotateSpeed = 4;
 		this.size = 15;
 		this.bulletSpeedCooldown = 0.5;
 	}

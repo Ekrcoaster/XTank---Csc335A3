@@ -46,7 +46,9 @@ public class ResultsSceneUI extends JPanel {
         buttonsPanel.setLayout(new GridLayout(1, 3, 15, 5));
         
         playAgainButton = new JButton("Play Again");
-        playAgainButton.addActionListener(l -> scene.playAgain());
+        if(Server.server != null)
+        	playAgainButton.addActionListener(l -> scene.playAgain());
+        
         toTitleButton = new JButton("To Title");
         toTitleButton.addActionListener(l -> scene.toTitle());
         exitButton = new JButton("Exit");
@@ -57,6 +59,8 @@ public class ResultsSceneUI extends JPanel {
         buttonsPanel.add(exitButton);
 
         add(buttonsPanel);
+        
+        update();
 	}
 	
 	/*

@@ -22,6 +22,7 @@ public class SceneManager {
 	
 	public static void main(String[] args) throws Exception {
 		new Client(true, Boot.defaultServerAdress, Boot.defaultPort, "me");
-		setScene(new BattleScene(Client.client.id, "you!", "magic", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), true, "empty"));
+		setScene(new BattleScene(Client.client.id, "you!", "magic", 
+				new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), true, "eyeball"));
 	}
 }

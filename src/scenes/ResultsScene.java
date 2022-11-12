@@ -7,6 +7,7 @@ package scenes;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import _main.Boot;
 import battle.tanks.ArchievedTank;
 import network.Client;
 import network.Message;
@@ -35,6 +36,7 @@ public class ResultsScene extends Scene implements NetworkListener {
 		if(Client.client != null) {
 			Client.client.addListener(this);
 		} else if(Server.server != null) {
+			System.out.println(" i am the server and added");
 			Server.server.addListener(this);
 		}
 	}
@@ -44,17 +46,7 @@ public class ResultsScene extends Scene implements NetworkListener {
 	public void onMessage(Message message) {
 		// once the results have arrived, create the archived tanks
 		if(message.is("results")) {
-			for(int i = 0; i < message.args.size(); i += 4) {
-				archievedTanks.add(new ArchievedTank(
-					message.getArg(i),
-					message.getArg(i+1),
-					message.doubleArg(i+2),
-					message.getArg(i+3)
-				));
-			}
-			Collections.sort(archievedTanks);
-			
-			ui.update();
+			processResults(message.joinedArgs());
 		}
 		
 		// if a client has exited, remove them from the list
@@ -62,7 +54,7 @@ public class ResultsScene extends Scene implements NetworkListener {
 			String clientID = message.fromID == null ? message.getArg(0) : message.fromID;
 			int index = -1;
 			for(int i = 0; i < archievedTanks.size(); i++) {
-				if(archievedTanks.get(index).getId().equals(clientID))
+				if(archievedTanks.get(i).getId().equals(clientID))
 					index = i;
 			}
 			
@@ -77,18 +69,21 @@ public class ResultsScene extends Scene implements NetworkListener {
 			SceneManager.setScene(new JoinScene(Client.client != null, Server.server != null, playerName, mapName));
 	}
 	
-	/*
-	 * Request to leave the game
-	 * Server: kick out all clients
-	 * Client: just leave and inform the server
-	 */
-	void requestLeave() {
-		if(Server.server != null) {
-			Server.server.close();
+	public void processResults(String results) {
+		archievedTanks = new ArrayList<ArchievedTank>();
+		String[] split = results.split(" ");
+		for(int i = 0; i < split.length; i += 4) {
+			archievedTanks.add(new ArchievedTank(
+				split[i],
+				split[i+1],
+				Double.parseDouble(split[i+2]),
+				split[i+3]
+			));
 		}
-		if(Client.client != null) {
-			Client.client.close();
-		}
+		
+		Collections.sort(archievedTanks);
+		
+		ui.update();
 	}
 	
 	/*
@@ -103,7 +98,7 @@ public class ResultsScene extends Scene implements NetworkListener {
 	 * leave the game and return to title
 	 */
 	public void toTitle() {
-		requestLeave();
+		Boot.closeAllNetworks();
 		SceneManager.setScene(new TitleScene());
 	}
 	
@@ -111,7 +106,7 @@ public class ResultsScene extends Scene implements NetworkListener {
 	 * leave the game and exit
 	 */
 	public void exitGame() {
-		requestLeave();
+		Boot.closeAllNetworks();
 		System.exit(0);
 	}
 

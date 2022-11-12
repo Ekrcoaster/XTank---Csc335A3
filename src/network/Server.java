@@ -150,6 +150,9 @@ public class Server extends NetworkActivityCaller implements MessageNode {
 		callListenersOnMessage(message);
 	}
 	
+	/*
+	 * This will close a server
+	 */
 	public void close() {
 		exit = true;
 		acceptingNewPlayers = false;

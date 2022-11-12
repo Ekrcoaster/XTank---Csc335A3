@@ -84,8 +84,9 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
 		// render each renderable
-		for(Renderable item : renderQueue) {
-			item.render(g);
+		for(int i = 0; i < renderQueue.size(); i++) {
+			if(renderQueue.get(i) != null)
+				renderQueue.get(i).render(g);
 		}
 
 		renderUI(g);
@@ -138,13 +139,13 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 			g.drawString(notification, (int)(Boot.windowSize.width * 0.47 - width * 0.5), (int)(Boot.windowSize.height * 0.5));
 		} else {
 			// draw the bottom notification
-			int width = 100;
+			int width = getFontMetrics(getFont()).stringWidth(notification);
 			if(frame < 60) {
 				g.setColor(frame/5 % 2 == 0 ? Color.black : notificationColor);
 			} else {
 				g.setColor(notificationColor);
 			}
-			g.drawString(notification, (int)(Boot.windowSize.width * 0.47 - width * 0.5), (int)(Boot.windowSize.height - 50));
+			g.drawString(notification, (int)(Boot.windowSize.width * 0.5 - width * 0.5), (int)(Boot.windowSize.height - 50));
 		}
 		
 

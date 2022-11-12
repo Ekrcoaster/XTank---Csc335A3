@@ -32,6 +32,7 @@ public class JoinSceneUI extends JPanel {
 	JPanel joinListPanel, tankSelectorPanel;
 	JoinScene scene;
 	DefaultListModel<String> playerListModel;
+	JList<String> list;
 	JScrollPane scroll;
 	
 	JButton beginGameButton;
@@ -142,12 +143,12 @@ public class JoinSceneUI extends JPanel {
         joinListPanel.add(playerListTitle);
         
 		playerListModel = new DefaultListModel<String>();
-        JList log = new JList<String>(playerListModel);
+		list = new JList<String>(playerListModel);
         
         
         // add the scroll functionality
         int scrollWidth = 275;
-        scroll = new JScrollPane(log);
+        scroll = new JScrollPane(list);
         scroll.setWheelScrollingEnabled(true);
         scroll.setBounds(50 + xOffset, 100, 50 + scrollWidth, Boot.windowSize.height - 300);
         joinListPanel.add(scroll);
@@ -207,7 +208,7 @@ public class JoinSceneUI extends JPanel {
 					scene.myPlayerTank = types.get(index).getType();
 					update();
 					Client.client.sendMessage("sTankType " + scene.myPlayerTank);
-					updatePlayerName(scene.playerIDs.indexOf(scene.myPlayerID), scene.myPlayerTank);
+					updatePlayerName(scene.playerIDs.indexOf(scene.myPlayerID), scene.myPlayerTank, true);
 				}
 				@Override public void mouseExited(MouseEvent e) { }
 				@Override public void mouseEntered(MouseEvent e) { }
@@ -226,6 +227,9 @@ public class JoinSceneUI extends JPanel {
 	public void update() {
 		for(int i = 0; i < types.size(); i++)
 			types.get(i).setSelected(i == selectedTankType);
+
+		beginGameButton.setEnabled(server && playerListModel.size() > 0);
+		list.repaint();
 	}
 	
 	/*
@@ -240,19 +244,29 @@ public class JoinSceneUI extends JPanel {
 	 */
 	public void addPlayerName(String name) {
 		playerListModel.addElement(name.replace("_", " ") + "   (the " + Boot.defaultTankType + " tank)");
-		beginGameButton.setEnabled(server && playerListModel.size() > 0);
+		update();
 	}
 	
 	/*
 	 * Update player name to the list
 	 */
-	public void updatePlayerName(int changeIndex, String type) {
+	public void updatePlayerName(int changeIndex, String type, boolean updateSelection) {
 		playerListModel.setElementAt(scene.playerNames.get(changeIndex).replace("_", " ") + "   (the " + type + " tank)", changeIndex);
-		for(int i = 0; i < tankNames.length; i++) {
-			if(tankNames[i].equals(type))
-				selectedTankType = i;
+		if(updateSelection) {
+			for(int i = 0; i < tankNames.length; i++) {
+				if(tankNames[i].equals(type))
+					selectedTankType = i;
+			}
 		}
+		
 		update();
 	}
 
+	/*
+	 * remove a player from the list
+	 */
+	public void removePlayer(int index) {
+		playerListModel.removeElementAt(index);
+		update();
+	}
 }

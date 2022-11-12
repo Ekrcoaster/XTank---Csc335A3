@@ -144,6 +144,7 @@ public class Client extends NetworkActivityCaller implements MessageNode {
     }
     
     public void close() {
+        sendMessage("clientExit");
         exit = true;
         Client.client = null;
     }

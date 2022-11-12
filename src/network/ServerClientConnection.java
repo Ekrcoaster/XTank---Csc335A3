@@ -65,18 +65,20 @@ public class ServerClientConnection implements Runnable, MessageNode {
 				
 				// the order here doesn't matter, i chose to tell the server first before myself
 				// so the debug consoles look more readable
-				Server.server.messageReceived(message);
+				if(Server.server != null)
+					Server.server.messageReceived(message);
 				messageReceived(message);
 				
 				// handle when the client leaves, just cancel exit command, exit out of this loop
 				if (message.is("clientExit")) {
-					System.out.println("they left");
 					exit = true;
-					Server.server.sendMessageToAllBut("aClientExited " + id, id);
-					return;
+					if(Server.server != null)
+						Server.server.sendMessageToAllBut("aClientExited " + id, id);
 				}
 				
 			}
+			if(Server.server != null)
+				Server.server.players.remove(id);
 			socket.close();
 		} 
 		catch (Exception e) 

@@ -9,6 +9,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import battle.map.ColliderRect;
+import network.Client;
+import network.Server;
 import scenes.SceneManager;
 import scenes.TitleScene;
 
@@ -55,6 +57,15 @@ public class Boot {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return "You!";
+		}
+	}
+	
+	public static void closeAllNetworks() {
+		if(Server.server != null) {
+			Server.server.close();
+		}
+		if(Client.client != null) {
+			Client.client.close();
 		}
 	}
 	
