@@ -6,6 +6,8 @@
 package scenes;
 
 import java.awt.Color;
+import java.awt.RenderingHints.Key;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +46,7 @@ public class BattleScene extends Scene implements NetworkListener {
 	boolean gameOver;
 	Tank winnerTank;
 	int timeOnWinnerScreen;
+	boolean clientExited;
 	
 	public BattleScene(String playerID, String playerName, String playerTankType, ArrayList<String> otherPlayerIDs, ArrayList<String> otherPlayerNames, ArrayList<String> otherPlayerTankTypes, boolean isServer, String mapName) {
 		this.players = new HashMap<String, Tank>();
@@ -52,6 +55,7 @@ public class BattleScene extends Scene implements NetworkListener {
 		this.playerID = playerID;
 		this.isServer = isServer;
 		this.gameOver = false;
+		this.clientExited = false;
 		
 		// create the map
 		this.map = new BattleMap(mapName, Boot.windowSize.width - 15, Boot.windowSize.height - 40);
@@ -177,8 +181,16 @@ public class BattleScene extends Scene implements NetworkListener {
 		
 		// update the tanks
 		for(Tank tank : players.values()) {
-			if(!tank.isServerControlled)
+			if(!tank.isServerControlled) {
+				// if the tank is dead, all them to press L to leave the game
+				if(tank.isDead() && ui.getKeysDown().contains(KeyEvent.VK_L) && !clientExited) {
+					clientExited = true;
+					Boot.closeAllNetworks();
+					SceneManager.setScene(new TitleScene());
+				}
+				
 				tank.updateControls(ui.getKeysDown());
+			}
 			tank.update();
 		}
 		
@@ -234,6 +246,14 @@ public class BattleScene extends Scene implements NetworkListener {
 				if(!sentFromMyself) bullets.add(createBullet(message.fromID, message.getArg(0), message.doubleArg(1), message.doubleArg(2), message.doubleArg(3)));
 				sendClientServerMessageToOthers("rBullet", message);
 			}
+
+			// handle if a player has left mid game, kill them instantly
+			if(message.is("clientExit")) {
+				String clientID = message.fromID == null ? message.getArg(0) : message.fromID;
+				players.get(clientID).setHealth(0);
+				Server.server.sendMessage("health " + clientID + " " + 0);
+				checkForEndOfGame();
+			}
 				
 		} else {
 			// server -> client position update
@@ -262,6 +282,8 @@ public class BattleScene extends Scene implements NetworkListener {
 			if(message.is("aClientExited"))
 				updateTankHealth(message.getArg(0), 0);
 		}
+		
+		
 	}
 	
 	/*

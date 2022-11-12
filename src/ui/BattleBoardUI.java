@@ -169,6 +169,11 @@ public class BattleBoardUI extends JPanel implements KeyListener{
 				g.drawRect(Boot.windowSize.width - 130, Boot.windowSize.height - 55, 100, 5);
 				g.fillRect(Boot.windowSize.width - 130, Boot.windowSize.height - 55, (int)(100 * clientTank.getBulletCooldownPercent()), 5);
 			}
+			
+			if(clientTank.isDead()) {
+				g.setColor(Color.red);
+				g.drawString("You are dead! You can leave the game, press L", 5, Boot.windowSize.height - 55);
+			}
 		}
 		
 		frame++;
