@@ -27,7 +27,7 @@ public class BombBullet extends Bullet {
 	public void update() {
 		super.update();
 		this.frame++;
-		this.speed = (1-(distanceTravelled / 800)) * 6;
+		this.speed = (1-(distanceTravelled / 500)) * 6;
 	}
 
 	@Override

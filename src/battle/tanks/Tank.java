@@ -108,11 +108,11 @@ public abstract class Tank implements Renderable, Comparable<Tank> {
 			savePositionToServer();
 		}
 		if(keysDown.contains(KeyEvent.VK_SPACE) && bulletActiveCooldown <= 0) {
-			Bullet shot = shoot(rotatePoint(0, -size*2, direction).offset(x, y), direction);
+			Bullet shot = shoot(rotatePoint(0, -size*1.5, direction).offset(x, y), direction);
 			scene.bullets.add(shot);
 			scene.addToRenderQueue(shot);
 			bulletActiveCooldown = bulletSpeedCooldown;
-			sendMessage("sBullet " + shot.getType() + " " + x + " " + y + " " + direction);
+			sendMessage("sBullet " + shot.getType() + " " + shot.x + " " + shot.y + " " + direction);
 		}
 	}
 
